@@ -1,0 +1,52 @@
+---
+title: MR analysis on gall bladder cancer
+author: "Gibran Hemani"
+date: "2024-08-13"
+---
+
+GWAS summary statistics provided: `GBC-Phase-1-All_OR.assoc.logistic Anand Iyer.csv`
+
+```{r}
+library(TwoSampleMR)
+library(ieugwasr)
+library(dplyr)
+library(here)
+library(data.table)
+library(qqman)
+exp_ids <- c("ieu-b-5135", "ebi-a-GCST90029037", "ukb-b-2227", "ieu-b-5122", "ebi-a-GCST90000050")
+exp_dat <- extract_instruments(exp_ids)
+```
+
+
+```{r}
+out_dat <- read_outcome_data(
+  snps = exp_dat$SNP,
+  filename = here("data", "GBC-Phase-1-All_OR.assoc.logistic_Anand_Iyer.csv.gz"),
+  sep = ",",
+  snp_col = "SNP",
+  beta_col = "BETA",
+  se_col = "SE",
+  effect_allele_col = "A1",
+  other_allele_col = "A2_MajorAllele",
+  eaf_col="A1_MinorAlleleFreq",
+  pval_col = "P"
+)
+```
+
+
+```{r}
+dat <- harmonise_data(exp_dat, out_dat, action = 1)
+table(dat$id.exposure)
+```
+
+
+```{r}
+mr(dat, method_list="mr_ivw")
+```
+
+
+```{r}
+outgwas <- fread(here("data", "GBC-Phase-1-All_OR.assoc.logistic_Anand_Iyer.csv.gz"))
+
+manhattan(outgwas, chr="CHR", bp="BP", snp="SNP", p="P", main="Gall bladder cancer GWAS")
+```

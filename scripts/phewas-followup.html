@@ -1,0 +1,2237 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.37">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Gibran Hemani">
+<meta name="dcterms.date" content="2024-08-13">
+
+<title>MR-PheWAS follow-up analysis on gall bladder cancer</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="phewas-followup_files/libs/clipboard/clipboard.min.js"></script>
+<script src="phewas-followup_files/libs/quarto-html/quarto.js" type="module"></script>
+<script src="phewas-followup_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="phewas-followup_files/libs/quarto-html/popper.min.js"></script>
+<script src="phewas-followup_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="phewas-followup_files/libs/quarto-html/anchor.min.js"></script>
+<link href="phewas-followup_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="phewas-followup_files/libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="phewas-followup_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="phewas-followup_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="phewas-followup_files/libs/bootstrap/bootstrap-138a6193a3bd40baf1e627da441a4734.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+
+
+</head>
+
+<body class="fullcontent quarto-light">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">MR-PheWAS follow-up analysis on gall bladder cancer</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Gibran Hemani </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">August 13, 2024</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>We can follow the example in https://explodecomputer.github.io/lab-book/posts/2026-05-22-phewas-example/chd_example.html</p>
+<p>Load libraries</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(here)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(TwoSampleMR)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ieugwasr)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(data.table)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(qqman)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(knitr)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Load the GBC GWAS sent to me:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>outgwas <span class="ot">&lt;-</span> <span class="fu">fread</span>(<span class="fu">here</span>(<span class="st">"data"</span>, <span class="st">"GBC-Phase-1-All_OR.assoc.logistic_Anand_Iyer.csv.gz"</span>))</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co"># manhattan(outgwas, chr="CHR", bp="BP", snp="SNP", p="P", main="Gall bladder cancer GWAS")</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>This doesn’t seem to have any GWAS hits? Get the PheWAS results sent to me previously, and lookup the SNPs used in the PheWAS:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>phewas_result <span class="ot">&lt;-</span> <span class="fu">fread</span>(<span class="fu">here</span>(<span class="st">"data/phewas/10_phewas_results_of_8_lead_snps_GBC.csv"</span>))</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">subset</span>(outgwas, SNP <span class="sc">%in%</span> phewas_result<span class="sc">$</span>rsid, <span class="at">select=</span><span class="fu">c</span>(<span class="st">"SNP"</span>, <span class="st">"P"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>          SNP         P
+       &lt;char&gt;     &lt;num&gt;
+1: rs60541816 3.947e-07
+2: rs67274221 2.051e-05
+3:  rs2131242 1.635e-04
+4:    rs15734 2.688e-04
+5:  rs6733452 3.277e-04
+6: rs35604230 4.075e-04
+7: rs77155094 1.646e-02
+8:  rs2312959 3.116e-01</code></pre>
+</div>
+</div>
+<p>These are very weakly associated with GBC. We can try to do a follow up analysis for illustration purposes but it will be difficult to interpret.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>phewas_followup <span class="ot">&lt;-</span> <span class="fu">fread</span>(<span class="fu">here</span>(<span class="st">"data/gbc-traits-from-phewas.csv"</span>), <span class="at">header=</span><span class="cn">FALSE</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>phewas_followup <span class="ot">&lt;-</span> <span class="fu">inner_join</span>(phewas_result, phewas_followup, <span class="at">by=</span><span class="fu">c</span>(<span class="st">"id"</span><span class="ot">=</span><span class="st">"V1"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(id, rsid, trait, p) <span class="sc">%&gt;%</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(p)</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(phewas_followup)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Classes 'data.table' and 'data.frame':  34 obs. of  4 variables:
+ $ id   : chr  "ebi-a-GCST90002346" "ebi-a-GCST90002402" "ebi-a-GCST90014023" "ebi-a-GCST90018819" ...
+ $ rsid : chr  "rs67274221" "rs67274221" "rs35604230" "rs6733452" ...
+ $ trait: chr  "Mean platelet volume" "Platelet count" "Type 1 diabetes" "Cholelithiasis" ...
+ $ p    : num  0.00 1.30e-160 9.59e-114 4.93e-85 9.20e-82 ...
+ - attr(*, ".internal.selfref")=&lt;pointer: 0x11d8144e0&gt; </code></pre>
+</div>
+</div>
+<p>Format GBC dataset</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>outgwasf <span class="ot">&lt;-</span> <span class="fu">format_data</span>(<span class="fu">as.data.frame</span>(outgwas), <span class="at">type=</span><span class="st">"outcome"</span>, <span class="at">snp_col=</span><span class="st">"SNP"</span>, <span class="at">beta_col=</span><span class="st">"BETA"</span>, <span class="at">se_col=</span><span class="st">"SE"</span>, <span class="at">effect_allele_col=</span><span class="st">"A1"</span>, <span class="at">other_allele_col=</span><span class="st">"A2_MajorAllele"</span>, <span class="at">eaf_col=</span><span class="st">"A1_MinorAlleleFreq"</span>, <span class="at">pval_col=</span><span class="st">"P"</span>, <span class="at">chr_col=</span><span class="st">"CHR"</span>, <span class="at">pos_col=</span><span class="st">"BP"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>No phenotype name specified, defaulting to 'outcome'.</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(outgwasf)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>'data.frame':   9896547 obs. of  13 variables:
+ $ chr.outcome          : int  7 7 7 7 7 7 7 7 7 7 ...
+ $ SNP                  : chr  "rs4148813" "rs60624924" "rs4148820" "rs59934297" ...
+ $ pos.outcome          : int  87092376 87096783 87080482 87116469 87118601 87115013 87117706 87118407 87114917 87113001 ...
+ $ effect_allele.outcome: chr  "G" "G" "C" "G" ...
+ $ pval.outcome         : num  5.68e-08 5.68e-08 6.55e-08 8.39e-08 8.39e-08 ...
+ $ other_allele.outcome : chr  "A" "A" "T" "T" ...
+ $ eaf.outcome          : num  0.238 0.238 0.238 0.117 0.117 ...
+ $ beta.outcome         : num  -0.398 -0.398 -0.396 -0.534 -0.534 ...
+ $ se.outcome           : num  0.0733 0.0733 0.0733 0.0997 0.0997 ...
+ $ outcome              : chr  "outcome" "outcome" "outcome" "outcome" ...
+ $ mr_keep.outcome      : logi  TRUE TRUE TRUE TRUE TRUE TRUE ...
+ $ pval_origin.outcome  : chr  "reported" "reported" "reported" "reported" ...
+ $ id.outcome           : chr  "SzGBU1" "SzGBU1" "SzGBU1" "SzGBU1" ...</code></pre>
+</div>
+</div>
+<p>Do the whole PheWAS follow-up analysis. For each trait, get the instruments, then for each instrument get the GBC SNPs that associate with it. Then for each target SNP-int pair make two exposure datasets, one using the target SNP, the other using all other SNPs.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>allintids <span class="ot">&lt;-</span> phewas_followup<span class="sc">$</span>id</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Get instrument sets for all of these traits</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>int_inst <span class="ot">&lt;-</span> <span class="fu">extract_instruments</span>(<span class="at">outcomes =</span> allintids)</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>int_chd <span class="ot">&lt;-</span> <span class="fu">lapply</span>(allintids, \(x) {</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">extract_outcome_data</span>(<span class="at">snps =</span> phewas_result<span class="sc">$</span>rsid, <span class="at">outcomes =</span> x) <span class="sc">%&gt;%</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(pval.outcome <span class="sc">&lt;</span> <span class="fl">5e-8</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">distinct</span>( )</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>int_chd <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(int_chd)</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(int_chd<span class="sc">$</span>id.outcome)</span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a><span class="co"># For each int trait, I need to get the GWAS target SNPs that associate with it. Then for each target SNP-int pair I need to make two exposure datasets, one using the target SNP, the other using all other SNPs.</span></span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>make_set <span class="ot">&lt;-</span> <span class="cf">function</span>(int_chd, int_inst) {</span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>    dats <span class="ot">&lt;-</span> <span class="fu">lapply</span>(<span class="dv">1</span><span class="sc">:</span><span class="fu">nrow</span>(int_chd), <span class="cf">function</span>(i) {</span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a>        snp <span class="ot">&lt;-</span> int_chd<span class="sc">$</span>SNP[i]</span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a>        int <span class="ot">&lt;-</span> int_chd<span class="sc">$</span>id.outcome[i]</span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a>        int_dat <span class="ot">&lt;-</span> int_inst <span class="sc">%&gt;%</span> <span class="fu">filter</span>(id.exposure <span class="sc">==</span> int)</span>
+<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a>        j <span class="ot">&lt;-</span> <span class="fu">which</span>(outgwasf<span class="sc">$</span>SNP <span class="sc">==</span> snp)</span>
+<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a>        target_region_dat <span class="ot">&lt;-</span> int_dat <span class="sc">%&gt;%</span></span>
+<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a>            <span class="fu">filter</span>(chr.exposure <span class="sc">==</span> outgwasf<span class="sc">$</span>chr.outcome[j] <span class="sc">&amp;</span> <span class="fu">abs</span>(pos.exposure <span class="sc">-</span> outgwasf<span class="sc">$</span>pos.outcome[j]) <span class="sc">&lt;</span> <span class="fl">1e6</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a>            <span class="fu">mutate</span>(</span>
+<span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a>                <span class="at">id.exposure =</span> <span class="fu">paste0</span>(<span class="st">"target - "</span>, snp, id.exposure),</span>
+<span id="cb11-29"><a href="#cb11-29" aria-hidden="true" tabindex="-1"></a>                <span class="at">exposure =</span> <span class="fu">paste0</span>(<span class="st">"target - "</span>, snp, <span class="st">" - "</span>, exposure)</span>
+<span id="cb11-30"><a href="#cb11-30" aria-hidden="true" tabindex="-1"></a>            )</span>
+<span id="cb11-31"><a href="#cb11-31" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb11-32"><a href="#cb11-32" aria-hidden="true" tabindex="-1"></a>        other_region_dat <span class="ot">&lt;-</span> <span class="fu">subset</span>(int_dat, <span class="sc">!</span>SNP <span class="sc">%in%</span> target_region_dat<span class="sc">$</span>SNP)</span>
+<span id="cb11-33"><a href="#cb11-33" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb11-34"><a href="#cb11-34" aria-hidden="true" tabindex="-1"></a>        <span class="fu">bind_rows</span>(other_region_dat, target_region_dat)</span>
+<span id="cb11-35"><a href="#cb11-35" aria-hidden="true" tabindex="-1"></a>    })</span>
+<span id="cb11-36"><a href="#cb11-36" aria-hidden="true" tabindex="-1"></a>    <span class="fu">names</span>(dats) <span class="ot">&lt;-</span> <span class="fu">paste</span>(int_chd<span class="sc">$</span>SNP, int_chd<span class="sc">$</span>id.outcome, <span class="at">sep=</span><span class="st">"_"</span>)</span>
+<span id="cb11-37"><a href="#cb11-37" aria-hidden="true" tabindex="-1"></a>    dats</span>
+<span id="cb11-38"><a href="#cb11-38" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb11-39"><a href="#cb11-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-40"><a href="#cb11-40" aria-hidden="true" tabindex="-1"></a>exp_sets <span class="ot">&lt;-</span> <span class="fu">make_set</span>(int_chd, int_inst)</span>
+<span id="cb11-41"><a href="#cb11-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-42"><a href="#cb11-42" aria-hidden="true" tabindex="-1"></a>outdat <span class="ot">&lt;-</span> <span class="fu">subset</span>(outgwasf, SNP <span class="sc">%in%</span> int_inst<span class="sc">$</span>SNP)</span>
+<span id="cb11-43"><a href="#cb11-43" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(outdat)</span>
+<span id="cb11-44"><a href="#cb11-44" aria-hidden="true" tabindex="-1"></a><span class="co"># phewas_result &lt;- phewas(chd$SNP)</span></span>
+<span id="cb11-45"><a href="#cb11-45" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(outdat, exp_sets, int_chd, int_inst, int_chd, outgwasf, phewas_result, <span class="at">file =</span> <span class="fu">here</span>(<span class="st">"data/gbc_phewas_results.Rdata"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">load</span>(<span class="fu">here</span>(<span class="st">"data/gbc_phewas_results.Rdata"</span>))</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>cochran_q <span class="ot">&lt;-</span> <span class="cf">function</span>(b, se) {</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>    w <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">/</span> se<span class="sc">^</span><span class="dv">2</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>    q <span class="ot">&lt;-</span> <span class="fu">sum</span>(w <span class="sc">*</span> (b <span class="sc">-</span> <span class="fu">sum</span>(w <span class="sc">*</span> b) <span class="sc">/</span> <span class="fu">sum</span>(w))<span class="sc">^</span><span class="dv">2</span>)</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>    qpval <span class="ot">&lt;-</span> <span class="fu">pchisq</span>(q, <span class="at">df=</span><span class="fu">length</span>(b)<span class="sc">-</span><span class="dv">1</span>, <span class="at">lower.tail=</span><span class="cn">FALSE</span>)</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">list</span>(<span class="at">q=</span>q, <span class="at">p=</span>qpval)</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>res_sets <span class="ot">&lt;-</span> <span class="fu">lapply</span>(exp_sets, <span class="cf">function</span>(exp_set) {</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>    dat <span class="ot">&lt;-</span> <span class="fu">harmonise_data</span>(exp_set, outdat, <span class="at">action =</span> <span class="dv">1</span>)</span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>    o <span class="ot">&lt;-</span> <span class="fu">mr</span>(dat, <span class="at">method_list=</span><span class="fu">c</span>(<span class="st">"mr_ivw"</span>, <span class="st">"mr_wald_ratio"</span>))</span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span>(<span class="fu">nrow</span>(o) <span class="sc">!=</span> <span class="dv">2</span>) <span class="fu">return</span>(<span class="cn">NULL</span>)</span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>    expname <span class="ot">&lt;-</span> o<span class="sc">$</span>exposure[<span class="sc">!</span><span class="fu">grepl</span>(<span class="st">"target"</span>, o<span class="sc">$</span>exposure)]</span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>    expname <span class="ot">&lt;-</span> <span class="fu">strsplit</span>(expname, <span class="st">"</span><span class="sc">\\</span><span class="st">|"</span>)[[<span class="dv">1</span>]][<span class="dv">1</span>]</span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>    o<span class="sc">$</span>int_trait <span class="ot">&lt;-</span> expname</span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>    rsid <span class="ot">&lt;-</span> o<span class="sc">$</span>exposure[<span class="fu">grepl</span>(<span class="st">"target"</span>, o<span class="sc">$</span>exposure)] <span class="sc">%&gt;%</span> {<span class="fu">strsplit</span>(., <span class="st">" - "</span>)[[<span class="dv">1</span>]][<span class="dv">2</span>]}</span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>    o<span class="sc">$</span>rsid <span class="ot">&lt;-</span> rsid</span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>    o<span class="sc">$</span>exposure[<span class="fu">grepl</span>(rsid, o<span class="sc">$</span>exposure)] <span class="ot">&lt;-</span> rsid</span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a>    ind <span class="ot">&lt;-</span> <span class="sc">!</span><span class="fu">grepl</span>(rsid, o<span class="sc">$</span>exposure)</span>
+<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a>    o<span class="sc">$</span>exposure[ind] <span class="ot">&lt;-</span> <span class="st">"All other SNPs"</span></span>
+<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a>    qres <span class="ot">&lt;-</span> <span class="fu">cochran_q</span>(o<span class="sc">$</span>b, o<span class="sc">$</span>se)</span>
+<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a>    o<span class="sc">$</span>cochran_q <span class="ot">&lt;-</span> qres<span class="sc">$</span>q</span>
+<span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a>    o<span class="sc">$</span>cochran_p <span class="ot">&lt;-</span> qres<span class="sc">$</span>p</span>
+<span id="cb12-25"><a href="#cb12-25" aria-hidden="true" tabindex="-1"></a>    o<span class="sc">$</span>cochran_q[ind] <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb12-26"><a href="#cb12-26" aria-hidden="true" tabindex="-1"></a>    o<span class="sc">$</span>cochran_p[ind] <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb12-27"><a href="#cb12-27" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb12-28"><a href="#cb12-28" aria-hidden="true" tabindex="-1"></a>    o</span>
+<span id="cb12-29"><a href="#cb12-29" aria-hidden="true" tabindex="-1"></a>})</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising Mean platelet volume || id:ebi-a-GCST90002346 (ebi-a-GCST90002346) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising target - rs67274221 - Mean platelet volume || id:ebi-a-GCST90002346 (target - rs67274221ebi-a-GCST90002346) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'ebi-a-GCST90002346' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'target - rs67274221ebi-a-GCST90002346' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising Mean platelet volume || id:ebi-a-GCST90002346 (ebi-a-GCST90002346) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising target - rs35604230 - Mean platelet volume || id:ebi-a-GCST90002346 (target - rs35604230ebi-a-GCST90002346) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'ebi-a-GCST90002346' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'target - rs35604230ebi-a-GCST90002346' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising Platelet count || id:ebi-a-GCST90002402 (ebi-a-GCST90002402) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising target - rs15734 - Platelet count || id:ebi-a-GCST90002402 (target - rs15734ebi-a-GCST90002402) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'ebi-a-GCST90002402' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'target - rs15734ebi-a-GCST90002402' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising Platelet count || id:ebi-a-GCST90002402 (ebi-a-GCST90002402) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising target - rs67274221 - Platelet count || id:ebi-a-GCST90002402 (target - rs67274221ebi-a-GCST90002402) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'ebi-a-GCST90002402' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'target - rs67274221ebi-a-GCST90002402' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising Platelet count || id:ebi-a-GCST90002402 (ebi-a-GCST90002402) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising target - rs35604230 - Platelet count || id:ebi-a-GCST90002402 (target - rs35604230ebi-a-GCST90002402) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'ebi-a-GCST90002402' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'target - rs35604230ebi-a-GCST90002402' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising Type 1 diabetes || id:ebi-a-GCST90014023 (ebi-a-GCST90014023) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising target - rs35604230 - Type 1 diabetes || id:ebi-a-GCST90014023 (target - rs35604230ebi-a-GCST90014023) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'ebi-a-GCST90014023' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'target - rs35604230ebi-a-GCST90014023' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising Cholelithiasis || id:ebi-a-GCST90018819 (ebi-a-GCST90018819) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising target - rs2131242 - Cholelithiasis || id:ebi-a-GCST90018819 (target - rs2131242ebi-a-GCST90018819) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'ebi-a-GCST90018819' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'target - rs2131242ebi-a-GCST90018819' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising Cholelithiasis || id:ebi-a-GCST90018819 (ebi-a-GCST90018819) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising target - rs6733452 - Cholelithiasis || id:ebi-a-GCST90018819 (target - rs6733452ebi-a-GCST90018819) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'ebi-a-GCST90018819' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'target - rs6733452ebi-a-GCST90018819' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising Cholelithiasis || id:ebi-a-GCST90018819 (ebi-a-GCST90018819) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising target - rs60541816 - Cholelithiasis || id:ebi-a-GCST90018819 (target - rs60541816ebi-a-GCST90018819) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'ebi-a-GCST90018819' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'target - rs60541816ebi-a-GCST90018819' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising Mean platelet volume || id:ebi-a-GCST90002346 (ebi-a-GCST90002346) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising target - rs67274221 - Mean platelet volume || id:ebi-a-GCST90002346 (target - rs67274221ebi-a-GCST90002346) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'ebi-a-GCST90002346' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'target - rs67274221ebi-a-GCST90002346' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising Mean platelet volume || id:ebi-a-GCST90002346 (ebi-a-GCST90002346) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising target - rs35604230 - Mean platelet volume || id:ebi-a-GCST90002346 (target - rs35604230ebi-a-GCST90002346) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'ebi-a-GCST90002346' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'target - rs35604230ebi-a-GCST90002346' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising target - rs6733452 - Disorders of gallbladder, biliary tract and pancreas || id:finn-b-K11_GALLBILPANC (target - rs6733452finn-b-K11_GALLBILPANC) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising Disorders of gallbladder, biliary tract and pancreas || id:finn-b-K11_GALLBILPANC (finn-b-K11_GALLBILPANC) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'target - rs6733452finn-b-K11_GALLBILPANC' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'finn-b-K11_GALLBILPANC' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising Disorders of gallbladder, biliary tract and pancreas || id:finn-b-K11_GALLBILPANC (finn-b-K11_GALLBILPANC) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising target - rs60541816 - Disorders of gallbladder, biliary tract and pancreas || id:finn-b-K11_GALLBILPANC (target - rs60541816finn-b-K11_GALLBILPANC) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'finn-b-K11_GALLBILPANC' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'target - rs60541816finn-b-K11_GALLBILPANC' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising Low density lipoprotein cholesterol levels || id:ebi-a-GCST90002412 (ebi-a-GCST90002412) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising target - rs6733452 - Low density lipoprotein cholesterol levels || id:ebi-a-GCST90002412 (target - rs6733452ebi-a-GCST90002412) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'ebi-a-GCST90002412' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'target - rs6733452ebi-a-GCST90002412' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising Low density lipoprotein cholesterol levels || id:ebi-a-GCST90002412 (ebi-a-GCST90002412) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising target - rs60541816 - Low density lipoprotein cholesterol levels || id:ebi-a-GCST90002412 (target - rs60541816ebi-a-GCST90002412) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'ebi-a-GCST90002412' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'target - rs60541816ebi-a-GCST90002412' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising Alanine aminotransferase levels || id:ebi-a-GCST90018943 (ebi-a-GCST90018943) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Removing the following SNPs for incompatible alleles:
+rs28752924</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising target - rs60541816 - Alanine aminotransferase levels || id:ebi-a-GCST90018943 (target - rs60541816ebi-a-GCST90018943) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'ebi-a-GCST90018943' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'target - rs60541816ebi-a-GCST90018943' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising Cholelithiasis || id:ebi-a-GCST90018819 (ebi-a-GCST90018819) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising target - rs2131242 - Cholelithiasis || id:ebi-a-GCST90018819 (target - rs2131242ebi-a-GCST90018819) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'ebi-a-GCST90018819' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'target - rs2131242ebi-a-GCST90018819' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising Cholelithiasis || id:ebi-a-GCST90018819 (ebi-a-GCST90018819) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising target - rs6733452 - Cholelithiasis || id:ebi-a-GCST90018819 (target - rs6733452ebi-a-GCST90018819) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'ebi-a-GCST90018819' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'target - rs6733452ebi-a-GCST90018819' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising Cholelithiasis || id:ebi-a-GCST90018819 (ebi-a-GCST90018819) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising target - rs60541816 - Cholelithiasis || id:ebi-a-GCST90018819 (target - rs60541816ebi-a-GCST90018819) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'ebi-a-GCST90018819' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'target - rs60541816ebi-a-GCST90018819' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising Rheumatoid arthritis || id:ieu-a-832 (ieu-a-832) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising target - rs35604230 - Rheumatoid arthritis || id:ieu-a-832 (target - rs35604230ieu-a-832) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'ieu-a-832' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'target - rs35604230ieu-a-832' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising target - rs6733452 - Disorders of gallbladder, biliary tract and pancreas || id:finn-b-K11_GALLBILPANC (target - rs6733452finn-b-K11_GALLBILPANC) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising Disorders of gallbladder, biliary tract and pancreas || id:finn-b-K11_GALLBILPANC (finn-b-K11_GALLBILPANC) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'target - rs6733452finn-b-K11_GALLBILPANC' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'finn-b-K11_GALLBILPANC' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising Disorders of gallbladder, biliary tract and pancreas || id:finn-b-K11_GALLBILPANC (finn-b-K11_GALLBILPANC) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising target - rs60541816 - Disorders of gallbladder, biliary tract and pancreas || id:finn-b-K11_GALLBILPANC (target - rs60541816finn-b-K11_GALLBILPANC) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'finn-b-K11_GALLBILPANC' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'target - rs60541816finn-b-K11_GALLBILPANC' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising Sex hormone-binding globulin levels adjusted for BMI || id:ebi-a-GCST90012110 (ebi-a-GCST90012110) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising target - rs35604230 - Sex hormone-binding globulin levels adjusted for BMI || id:ebi-a-GCST90012110 (target - rs35604230ebi-a-GCST90012110) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'ebi-a-GCST90012110' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'target - rs35604230ebi-a-GCST90012110' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising Hip circumference || id:ukb-b-15590 (ukb-b-15590) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising target - rs35604230 - Hip circumference || id:ukb-b-15590 (target - rs35604230ukb-b-15590) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'ukb-b-15590' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'target - rs35604230ukb-b-15590' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising Trunk fat mass || id:ukb-b-20044 (ukb-b-20044) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising target - rs35604230 - Trunk fat mass || id:ukb-b-20044 (target - rs35604230ukb-b-20044) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'ukb-b-20044' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'target - rs35604230ukb-b-20044' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising systolic blood pressure || id:ieu-b-38 (ieu-b-38) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising target - rs35604230 - systolic blood pressure || id:ieu-b-38 (target - rs35604230ieu-b-38) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'ieu-b-38' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'target - rs35604230ieu-b-38' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising Total cholesterol levels || id:ebi-a-GCST90018974 (ebi-a-GCST90018974) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising target - rs6733452 - Total cholesterol levels || id:ebi-a-GCST90018974 (target - rs6733452ebi-a-GCST90018974) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'ebi-a-GCST90018974' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'target - rs6733452ebi-a-GCST90018974' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising Body mass index (BMI) || id:ukb-b-19953 (ukb-b-19953) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Removing the following SNPs for incompatible alleles:
+rs9674487</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising target - rs35604230 - Body mass index (BMI) || id:ukb-b-19953 (target - rs35604230ukb-b-19953) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'ukb-b-19953' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'target - rs35604230ukb-b-19953' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising Platelet count || id:ebi-a-GCST90002402 (ebi-a-GCST90002402) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising target - rs15734 - Platelet count || id:ebi-a-GCST90002402 (target - rs15734ebi-a-GCST90002402) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'ebi-a-GCST90002402' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'target - rs15734ebi-a-GCST90002402' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising Platelet count || id:ebi-a-GCST90002402 (ebi-a-GCST90002402) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising target - rs67274221 - Platelet count || id:ebi-a-GCST90002402 (target - rs67274221ebi-a-GCST90002402) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'ebi-a-GCST90002402' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'target - rs67274221ebi-a-GCST90002402' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising Platelet count || id:ebi-a-GCST90002402 (ebi-a-GCST90002402) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising target - rs35604230 - Platelet count || id:ebi-a-GCST90002402 (target - rs35604230ebi-a-GCST90002402) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'ebi-a-GCST90002402' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'target - rs35604230ebi-a-GCST90002402' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising Cholelithiasis || id:ebi-a-GCST90018819 (ebi-a-GCST90018819) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising target - rs2131242 - Cholelithiasis || id:ebi-a-GCST90018819 (target - rs2131242ebi-a-GCST90018819) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'ebi-a-GCST90018819' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'target - rs2131242ebi-a-GCST90018819' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising Cholelithiasis || id:ebi-a-GCST90018819 (ebi-a-GCST90018819) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising target - rs6733452 - Cholelithiasis || id:ebi-a-GCST90018819 (target - rs6733452ebi-a-GCST90018819) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'ebi-a-GCST90018819' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'target - rs6733452ebi-a-GCST90018819' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising Cholelithiasis || id:ebi-a-GCST90018819 (ebi-a-GCST90018819) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising target - rs60541816 - Cholelithiasis || id:ebi-a-GCST90018819 (target - rs60541816ebi-a-GCST90018819) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'ebi-a-GCST90018819' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'target - rs60541816ebi-a-GCST90018819' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising diastolic blood pressure || id:ieu-b-39 (ieu-b-39) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising target - rs35604230 - diastolic blood pressure || id:ieu-b-39 (target - rs35604230ieu-b-39) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'ieu-b-39' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'target - rs35604230ieu-b-39' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising Apoliprotein B || id:ukb-d-30640_raw (ukb-d-30640_raw) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising target - rs6733452 - Apoliprotein B || id:ukb-d-30640_raw (target - rs6733452ukb-d-30640_raw) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'ukb-d-30640_raw' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'target - rs6733452ukb-d-30640_raw' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising Eosinophil counts || id:ebi-a-GCST90002381 (ebi-a-GCST90002381) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising target - rs35604230 - Eosinophil counts || id:ebi-a-GCST90002381 (target - rs35604230ebi-a-GCST90002381) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'ebi-a-GCST90002381' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'target - rs35604230ebi-a-GCST90002381' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising Urate levels (UKB data field 30880) || id:ebi-a-GCST90014015 (ebi-a-GCST90014015) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising target - rs35604230 - Urate levels (UKB data field 30880) || id:ebi-a-GCST90014015 (target - rs35604230ebi-a-GCST90014015) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'ebi-a-GCST90014015' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'target - rs35604230ebi-a-GCST90014015' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising Low density lipoprotein cholesterol levels || id:ebi-a-GCST90002412 (ebi-a-GCST90002412) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising target - rs6733452 - Low density lipoprotein cholesterol levels || id:ebi-a-GCST90002412 (target - rs6733452ebi-a-GCST90002412) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'ebi-a-GCST90002412' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'target - rs6733452ebi-a-GCST90002412' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising Low density lipoprotein cholesterol levels || id:ebi-a-GCST90002412 (ebi-a-GCST90002412) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising target - rs60541816 - Low density lipoprotein cholesterol levels || id:ebi-a-GCST90002412 (target - rs60541816ebi-a-GCST90002412) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'ebi-a-GCST90002412' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'target - rs60541816ebi-a-GCST90002412' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising Hematocrit || id:ebi-a-GCST90002304 (ebi-a-GCST90002304) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising target - rs35604230 - Hematocrit || id:ebi-a-GCST90002304 (target - rs35604230ebi-a-GCST90002304) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'ebi-a-GCST90002304' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'target - rs35604230ebi-a-GCST90002304' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising Aspartate aminotransferase levels || id:ebi-a-GCST90018944 (ebi-a-GCST90018944) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising target - rs60541816 - Aspartate aminotransferase levels || id:ebi-a-GCST90018944 (target - rs60541816ebi-a-GCST90018944) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'ebi-a-GCST90018944' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'target - rs60541816ebi-a-GCST90018944' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising Mean corpuscular volume || id:ukb-d-30040_irnt (ukb-d-30040_irnt) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising target - rs35604230 - Mean corpuscular volume || id:ukb-d-30040_irnt (target - rs35604230ukb-d-30040_irnt) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'ukb-d-30040_irnt' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'target - rs35604230ukb-d-30040_irnt' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising Diabetic retinopathy (DM_RETINOPATHY) || id:finn-b-DM_RETINOPATHY (finn-b-DM_RETINOPATHY) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising target - rs35604230 - Diabetic retinopathy (DM_RETINOPATHY) || id:finn-b-DM_RETINOPATHY (target - rs35604230finn-b-DM_RETINOPATHY) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'finn-b-DM_RETINOPATHY' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'target - rs35604230finn-b-DM_RETINOPATHY' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising Height || id:ebi-a-GCST90029008 (ebi-a-GCST90029008) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising target - rs60541816 - Height || id:ebi-a-GCST90029008 (target - rs60541816ebi-a-GCST90029008) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'ebi-a-GCST90029008' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'target - rs60541816ebi-a-GCST90029008' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising Pulse rate, automated reading || id:ukb-b-18103 (ukb-b-18103) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising target - rs15734 - Pulse rate, automated reading || id:ukb-b-18103 (target - rs15734ukb-b-18103) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'ukb-b-18103' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'target - rs15734ukb-b-18103' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising Thyroid problem (not cancer) || id:ebi-a-GCST90038635 (ebi-a-GCST90038635) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising target - rs35604230 - Thyroid problem (not cancer) || id:ebi-a-GCST90038635 (target - rs35604230ebi-a-GCST90038635) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'ebi-a-GCST90038635' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'target - rs35604230ebi-a-GCST90038635' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising Platelet count || id:ebi-a-GCST90002402 (ebi-a-GCST90002402) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising target - rs15734 - Platelet count || id:ebi-a-GCST90002402 (target - rs15734ebi-a-GCST90002402) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'ebi-a-GCST90002402' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'target - rs15734ebi-a-GCST90002402' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising Platelet count || id:ebi-a-GCST90002402 (ebi-a-GCST90002402) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising target - rs67274221 - Platelet count || id:ebi-a-GCST90002402 (target - rs67274221ebi-a-GCST90002402) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'ebi-a-GCST90002402' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'target - rs67274221ebi-a-GCST90002402' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising Platelet count || id:ebi-a-GCST90002402 (ebi-a-GCST90002402) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising target - rs35604230 - Platelet count || id:ebi-a-GCST90002402 (target - rs35604230ebi-a-GCST90002402) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'ebi-a-GCST90002402' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'target - rs35604230ebi-a-GCST90002402' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising Age at menarche || id:ieu-b-5136 (ieu-b-5136) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising target - rs35604230 - Age at menarche || id:ieu-b-5136 (target - rs35604230ieu-b-5136) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'ieu-b-5136' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'target - rs35604230ieu-b-5136' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising target - rs6733452 - Disorders of gallbladder, biliary tract and pancreas || id:finn-b-K11_GALLBILPANC (target - rs6733452finn-b-K11_GALLBILPANC) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising Disorders of gallbladder, biliary tract and pancreas || id:finn-b-K11_GALLBILPANC (finn-b-K11_GALLBILPANC) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'target - rs6733452finn-b-K11_GALLBILPANC' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'finn-b-K11_GALLBILPANC' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising Disorders of gallbladder, biliary tract and pancreas || id:finn-b-K11_GALLBILPANC (finn-b-K11_GALLBILPANC) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising target - rs60541816 - Disorders of gallbladder, biliary tract and pancreas || id:finn-b-K11_GALLBILPANC (target - rs60541816finn-b-K11_GALLBILPANC) and outcome (mPgmAW)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'finn-b-K11_GALLBILPANC' on 'mPgmAW'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'target - rs60541816finn-b-K11_GALLBILPANC' on 'mPgmAW'</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb227"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb227-1"><a href="#cb227-1" aria-hidden="true" tabindex="-1"></a>plot_int <span class="ot">&lt;-</span> <span class="cf">function</span>(res_sets, int_id) {</span>
+<span id="cb227-2"><a href="#cb227-2" aria-hidden="true" tabindex="-1"></a>    <span class="co"># keep mr_results that grepl int_name in the exposure name</span></span>
+<span id="cb227-3"><a href="#cb227-3" aria-hidden="true" tabindex="-1"></a>    rs <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(res_sets)</span>
+<span id="cb227-4"><a href="#cb227-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ggplot</span>(rs, <span class="fu">aes</span>(<span class="at">x=</span>b, <span class="at">y=</span>exposure)) <span class="sc">+</span></span>
+<span id="cb227-5"><a href="#cb227-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">colour =</span> cochran_p <span class="sc">&lt;</span> <span class="fl">0.05</span>)) <span class="sc">+</span></span>
+<span id="cb227-6"><a href="#cb227-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_errorbarh</span>(<span class="fu">aes</span>(<span class="at">xmin=</span>b<span class="fl">-1.96</span><span class="sc">*</span>se, <span class="at">xmax=</span>b<span class="fl">+1.96</span><span class="sc">*</span>se, <span class="at">colour =</span> cochran_p <span class="sc">&lt;</span> <span class="fl">0.05</span>), <span class="at">height=</span><span class="dv">0</span>) <span class="sc">+</span></span>
+<span id="cb227-7"><a href="#cb227-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_vline</span>(<span class="at">xintercept=</span><span class="dv">0</span>, <span class="at">linetype=</span><span class="st">"dashed"</span>, <span class="at">color=</span><span class="st">"red"</span>) <span class="sc">+</span></span>
+<span id="cb227-8"><a href="#cb227-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">x=</span><span class="st">"MR Estimate (log OR)"</span>, <span class="at">y=</span><span class="st">"Target region"</span>) <span class="sc">+</span></span>
+<span id="cb227-9"><a href="#cb227-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">facet_wrap</span>(int_trait <span class="sc">~</span> ., <span class="at">scales =</span> <span class="st">"free"</span>, <span class="at">ncol=</span><span class="dv">1</span>, <span class="at">space=</span><span class="st">"free_y"</span>) <span class="sc">+</span></span>
+<span id="cb227-10"><a href="#cb227-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_colour_manual</span>(<span class="at">values=</span><span class="fu">c</span>(<span class="st">"black"</span>, <span class="st">"red"</span>), <span class="at">labels=</span><span class="fu">c</span>(<span class="st">"Cochran's Q p &gt;= 0.05"</span>, <span class="st">"Cochran's Q p &lt; 0.05"</span>)) <span class="sc">+</span></span>
+<span id="cb227-11"><a href="#cb227-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme</span>(<span class="at">axis.text.y =</span> <span class="fu">element_text</span>(<span class="at">size=</span><span class="dv">10</span>))</span>
+<span id="cb227-12"><a href="#cb227-12" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb227-13"><a href="#cb227-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb227-14"><a href="#cb227-14" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_int</span>(res_sets, <span class="dv">1</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: `geom_errorbarh()` was deprecated in ggplot2 4.0.0.
+ℹ Please use the `orientation` argument of `geom_errorbar()` instead.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>`height` was translated to `width`.</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="phewas-followup_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb230"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb230-1"><a href="#cb230-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="fu">here</span>(<span class="st">"figures/phewas_followup_results.pdf"</span>), <span class="at">width=</span><span class="dv">8</span>, <span class="at">height=</span><span class="dv">30</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>`height` was translated to `width`.</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb232"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb232-1"><a href="#cb232-1" aria-hidden="true" tabindex="-1"></a><span class="fu">bind_rows</span>(res_sets) <span class="sc">%&gt;%</span> <span class="fu">filter</span>(exposure <span class="sc">==</span> <span class="st">"All other SNPs"</span>) <span class="sc">%&gt;%</span> <span class="fu">select</span>(int_trait, b, se, pval) <span class="sc">%&gt;%</span> <span class="fu">arrange</span>(pval)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                                               int_trait           b         se
+1                                        Cholelithiasis   0.76085962 0.15276988
+2                                        Cholelithiasis   0.76085962 0.15276988
+3                                        Cholelithiasis   0.76085962 0.15276988
+4                                        Cholelithiasis   0.63940240 0.15558697
+5                                        Cholelithiasis   0.63940240 0.15558697
+6                                        Cholelithiasis   0.63940240 0.15558697
+7  Disorders of gallbladder, biliary tract and pancreas   0.69102043 0.16840733
+8  Disorders of gallbladder, biliary tract and pancreas   0.69102043 0.16840733
+9  Disorders of gallbladder, biliary tract and pancreas   0.69102043 0.16840733
+10 Disorders of gallbladder, biliary tract and pancreas   0.94583327 0.27419954
+11 Disorders of gallbladder, biliary tract and pancreas   0.94583327 0.27419954
+12 Disorders of gallbladder, biliary tract and pancreas   0.94583327 0.27419954
+13                                       Cholelithiasis   0.67732855 0.23151190
+14                                       Cholelithiasis   0.67732855 0.23151190
+15                                       Cholelithiasis   0.67732855 0.23151190
+16                  Urate levels (UKB data field 30880)  -0.48881099 0.23319848
+17                                 Rheumatoid arthritis   0.17318411 0.08332941
+18                                       Platelet count   0.21378564 0.11171322
+19                                       Platelet count   0.21378564 0.11171322
+20                                       Platelet count   0.21378564 0.11171322
+21                                       Platelet count   0.20886909 0.11327169
+22                                       Platelet count   0.20886909 0.11327169
+23                                       Platelet count   0.20886909 0.11327169
+24                             diastolic blood pressure   0.03448554 0.01876697
+25                                 Mean platelet volume  -0.16523897 0.09283344
+26                                 Mean platelet volume  -0.16523897 0.09283344
+27                                 Mean platelet volume  -0.15102447 0.08745369
+28                                 Mean platelet volume  -0.15102447 0.08745369
+29                                       Platelet count   0.19683324 0.11672658
+30                                       Platelet count   0.19683324 0.11672658
+31                                       Platelet count   0.19683324 0.11672658
+32                                    Hip circumference   0.28827474 0.20622850
+33                                Body mass index (BMI)   0.22556184 0.19059317
+34                        Pulse rate, automated reading   0.22126118 0.19503113
+35                         Thyroid problem (not cancer)   1.72960591 1.54272264
+36                                      Type 1 diabetes   0.05962822 0.05653125
+37                              Mean corpuscular volume   0.09814179 0.11259044
+38           Low density lipoprotein cholesterol levels  -0.10404088 0.13394126
+39           Low density lipoprotein cholesterol levels  -0.10404088 0.13394126
+40                                               Height  -0.08532874 0.11240208
+41                                       Apoliprotein B  -0.45735532 0.63555455
+42                                      Age at menarche  -0.06350019 0.11033733
+43 Sex hormone-binding globulin levels adjusted for BMI   0.15243035 0.28914465
+44                      Alanine aminotransferase levels  -0.13957288 0.27109160
+45                    Aspartate aminotransferase levels  -0.11160222 0.24000886
+46                             Total cholesterol levels  -0.08942820 0.20064560
+47                              systolic blood pressure  -0.00454019 0.01126133
+48                                           Hematocrit  -0.04681757 0.16936049
+49                                       Trunk fat mass  -0.04716815 0.20236062
+50                                    Eosinophil counts  -0.02910988 0.15109880
+51           Low density lipoprotein cholesterol levels  -0.02592465 0.13829933
+52           Low density lipoprotein cholesterol levels  -0.02592465 0.13829933
+53                Diabetic retinopathy (DM_RETINOPATHY)   0.03045405 0.22046572
+           pval
+1  6.344326e-07
+2  6.344326e-07
+3  6.344326e-07
+4  3.963207e-05
+5  3.963207e-05
+6  3.963207e-05
+7  4.073547e-05
+8  4.073547e-05
+9  4.073547e-05
+10 5.617627e-04
+11 5.617627e-04
+12 5.617627e-04
+13 3.437099e-03
+14 3.437099e-03
+15 3.437099e-03
+16 3.607193e-02
+17 3.768108e-02
+18 5.565844e-02
+19 5.565844e-02
+20 5.565844e-02
+21 6.518818e-02
+22 6.518818e-02
+23 6.518818e-02
+24 6.612648e-02
+25 7.508398e-02
+26 7.508398e-02
+27 8.418418e-02
+28 8.418418e-02
+29 9.174264e-02
+30 9.174264e-02
+31 9.174264e-02
+32 1.621607e-01
+33 2.366218e-01
+34 2.565884e-01
+35 2.622289e-01
+36 2.915244e-01
+37 3.833880e-01
+38 4.372975e-01
+39 4.372975e-01
+40 4.477697e-01
+41 4.717614e-01
+42 5.649467e-01
+43 5.980708e-01
+44 6.066543e-01
+45 6.419371e-01
+46 6.558123e-01
+47 6.868257e-01
+48 7.822122e-01
+49 8.156918e-01
+50 8.472295e-01
+51 8.513053e-01
+52 8.513053e-01
+53 8.901337e-01</code></pre>
+</div>
+</div>
+<p>Do the simpler analysis - just MR of phewas hits on GBC without the target SNPs</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb234"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb234-1"><a href="#cb234-1" aria-hidden="true" tabindex="-1"></a>expdat <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(exp_sets) <span class="sc">%&gt;%</span> <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">grepl</span>(<span class="st">"target"</span>, exposure)) <span class="sc">%&gt;%</span> <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">duplicated</span>(<span class="fu">paste</span>(id.exposure, SNP)))</span>
+<span id="cb234-2"><a href="#cb234-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb234-3"><a href="#cb234-3" aria-hidden="true" tabindex="-1"></a>alldat <span class="ot">&lt;-</span> <span class="fu">harmonise_data</span>(expdat, outgwasf, <span class="at">action =</span> <span class="dv">1</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising Body mass index (BMI) || id:ukb-b-19953 (ukb-b-19953) and outcome (SzGBU1)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Removing the following SNPs for incompatible alleles:
+rs9674487</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising systolic blood pressure || id:ieu-b-38 (ieu-b-38) and outcome (SzGBU1)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising Age at menarche || id:ieu-b-5136 (ieu-b-5136) and outcome (SzGBU1)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising Height || id:ebi-a-GCST90029008 (ebi-a-GCST90029008) and outcome (SzGBU1)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising Mean platelet volume || id:ebi-a-GCST90002346 (ebi-a-GCST90002346) and outcome (SzGBU1)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising Low density lipoprotein cholesterol levels || id:ebi-a-GCST90002412 (ebi-a-GCST90002412) and outcome (SzGBU1)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising Mean corpuscular volume || id:ukb-d-30040_irnt (ukb-d-30040_irnt) and outcome (SzGBU1)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising Cholelithiasis || id:ebi-a-GCST90018819 (ebi-a-GCST90018819) and outcome (SzGBU1)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising Sex hormone-binding globulin levels adjusted for BMI || id:ebi-a-GCST90012110 (ebi-a-GCST90012110) and outcome (SzGBU1)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising Hematocrit || id:ebi-a-GCST90002304 (ebi-a-GCST90002304) and outcome (SzGBU1)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising diastolic blood pressure || id:ieu-b-39 (ieu-b-39) and outcome (SzGBU1)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising Eosinophil counts || id:ebi-a-GCST90002381 (ebi-a-GCST90002381) and outcome (SzGBU1)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising Platelet count || id:ebi-a-GCST90002402 (ebi-a-GCST90002402) and outcome (SzGBU1)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising Trunk fat mass || id:ukb-b-20044 (ukb-b-20044) and outcome (SzGBU1)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising Urate levels (UKB data field 30880) || id:ebi-a-GCST90014015 (ebi-a-GCST90014015) and outcome (SzGBU1)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising Hip circumference || id:ukb-b-15590 (ukb-b-15590) and outcome (SzGBU1)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising Alanine aminotransferase levels || id:ebi-a-GCST90018943 (ebi-a-GCST90018943) and outcome (SzGBU1)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Removing the following SNPs for incompatible alleles:
+rs28752924</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising Total cholesterol levels || id:ebi-a-GCST90018974 (ebi-a-GCST90018974) and outcome (SzGBU1)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising Apoliprotein B || id:ukb-d-30640_raw (ukb-d-30640_raw) and outcome (SzGBU1)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising Aspartate aminotransferase levels || id:ebi-a-GCST90018944 (ebi-a-GCST90018944) and outcome (SzGBU1)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising Pulse rate, automated reading || id:ukb-b-18103 (ukb-b-18103) and outcome (SzGBU1)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising Type 1 diabetes || id:ebi-a-GCST90014023 (ebi-a-GCST90014023) and outcome (SzGBU1)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising Thyroid problem (not cancer) || id:ebi-a-GCST90038635 (ebi-a-GCST90038635) and outcome (SzGBU1)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising Diabetic retinopathy (DM_RETINOPATHY) || id:finn-b-DM_RETINOPATHY (finn-b-DM_RETINOPATHY) and outcome (SzGBU1)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising Rheumatoid arthritis || id:ieu-a-832 (ieu-a-832) and outcome (SzGBU1)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Harmonising Disorders of gallbladder, biliary tract and pancreas || id:finn-b-K11_GALLBILPANC (finn-b-K11_GALLBILPANC) and outcome (SzGBU1)</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb263"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb263-1"><a href="#cb263-1" aria-hidden="true" tabindex="-1"></a>phewas_mr_res <span class="ot">&lt;-</span> <span class="fu">mr</span>(alldat, <span class="at">method_list=</span><span class="fu">c</span>(<span class="st">"mr_ivw"</span>, <span class="st">"mr_wald_ratio"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'ukb-b-19953' on 'SzGBU1'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'ieu-b-38' on 'SzGBU1'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'ieu-b-5136' on 'SzGBU1'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'ebi-a-GCST90029008' on 'SzGBU1'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'ebi-a-GCST90002346' on 'SzGBU1'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'ebi-a-GCST90002412' on 'SzGBU1'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'ukb-d-30040_irnt' on 'SzGBU1'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'ebi-a-GCST90018819' on 'SzGBU1'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'ebi-a-GCST90012110' on 'SzGBU1'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'ebi-a-GCST90002304' on 'SzGBU1'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'ieu-b-39' on 'SzGBU1'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'ebi-a-GCST90002381' on 'SzGBU1'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'ebi-a-GCST90002402' on 'SzGBU1'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'ukb-b-20044' on 'SzGBU1'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'ebi-a-GCST90014015' on 'SzGBU1'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'ukb-b-15590' on 'SzGBU1'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'ebi-a-GCST90018943' on 'SzGBU1'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'ebi-a-GCST90018974' on 'SzGBU1'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'ukb-d-30640_raw' on 'SzGBU1'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'ebi-a-GCST90018944' on 'SzGBU1'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'ukb-b-18103' on 'SzGBU1'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'ebi-a-GCST90014023' on 'SzGBU1'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'ebi-a-GCST90038635' on 'SzGBU1'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'finn-b-DM_RETINOPATHY' on 'SzGBU1'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'ieu-a-832' on 'SzGBU1'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Analysing 'finn-b-K11_GALLBILPANC' on 'SzGBU1'</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb290"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb290-1"><a href="#cb290-1" aria-hidden="true" tabindex="-1"></a>phewas_mr_res <span class="sc">%&gt;%</span> <span class="fu">select</span>(exposure, nsnp, b, se, pval) <span class="sc">%&gt;%</span> <span class="fu">arrange</span>(pval) <span class="sc">%&gt;%</span> <span class="fu">kable</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<colgroup>
+<col style="width: 71%">
+<col style="width: 3%">
+<col style="width: 8%">
+<col style="width: 7%">
+<col style="width: 7%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">exposure</th>
+<th style="text-align: right;">nsnp</th>
+<th style="text-align: right;">b</th>
+<th style="text-align: right;">se</th>
+<th style="text-align: right;">pval</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Cholelithiasis || id:ebi-a-GCST90018819</td>
+<td style="text-align: right;">46</td>
+<td style="text-align: right;">0.7051709</td>
+<td style="text-align: right;">0.1662020</td>
+<td style="text-align: right;">0.0000221</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Disorders of gallbladder, biliary tract and pancreas || id:finn-b-K11_GALLBILPANC</td>
+<td style="text-align: right;">23</td>
+<td style="text-align: right;">0.7880793</td>
+<td style="text-align: right;">0.1860154</td>
+<td style="text-align: right;">0.0000227</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Urate levels (UKB data field 30880) || id:ebi-a-GCST90014015</td>
+<td style="text-align: right;">284</td>
+<td style="text-align: right;">-0.4888110</td>
+<td style="text-align: right;">0.2331985</td>
+<td style="text-align: right;">0.0360719</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Rheumatoid arthritis || id:ieu-a-832</td>
+<td style="text-align: right;">38</td>
+<td style="text-align: right;">0.1731841</td>
+<td style="text-align: right;">0.0833294</td>
+<td style="text-align: right;">0.0376811</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">diastolic blood pressure || id:ieu-b-39</td>
+<td style="text-align: right;">446</td>
+<td style="text-align: right;">0.0344855</td>
+<td style="text-align: right;">0.0187670</td>
+<td style="text-align: right;">0.0661265</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Platelet count || id:ebi-a-GCST90002402</td>
+<td style="text-align: right;">494</td>
+<td style="text-align: right;">0.2041645</td>
+<td style="text-align: right;">0.1125842</td>
+<td style="text-align: right;">0.0697644</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Mean platelet volume || id:ebi-a-GCST90002346</td>
+<td style="text-align: right;">496</td>
+<td style="text-align: right;">-0.1463293</td>
+<td style="text-align: right;">0.0871633</td>
+<td style="text-align: right;">0.0931921</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Hip circumference || id:ukb-b-15590</td>
+<td style="text-align: right;">405</td>
+<td style="text-align: right;">0.2882747</td>
+<td style="text-align: right;">0.2062285</td>
+<td style="text-align: right;">0.1621607</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Body mass index (BMI) || id:ukb-b-19953</td>
+<td style="text-align: right;">442</td>
+<td style="text-align: right;">0.2255618</td>
+<td style="text-align: right;">0.1905932</td>
+<td style="text-align: right;">0.2366218</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Pulse rate, automated reading || id:ukb-b-18103</td>
+<td style="text-align: right;">279</td>
+<td style="text-align: right;">0.2212612</td>
+<td style="text-align: right;">0.1950311</td>
+<td style="text-align: right;">0.2565884</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Thyroid problem (not cancer) || id:ebi-a-GCST90038635</td>
+<td style="text-align: right;">126</td>
+<td style="text-align: right;">1.7296059</td>
+<td style="text-align: right;">1.5427226</td>
+<td style="text-align: right;">0.2622289</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Type 1 diabetes || id:ebi-a-GCST90014023</td>
+<td style="text-align: right;">77</td>
+<td style="text-align: right;">0.0596282</td>
+<td style="text-align: right;">0.0565312</td>
+<td style="text-align: right;">0.2915244</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Mean corpuscular volume || id:ukb-d-30040_irnt</td>
+<td style="text-align: right;">334</td>
+<td style="text-align: right;">0.0981418</td>
+<td style="text-align: right;">0.1125904</td>
+<td style="text-align: right;">0.3833880</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Height || id:ebi-a-GCST90029008</td>
+<td style="text-align: right;">845</td>
+<td style="text-align: right;">-0.0853287</td>
+<td style="text-align: right;">0.1124021</td>
+<td style="text-align: right;">0.4477697</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Apoliprotein B || id:ukb-d-30640_raw</td>
+<td style="text-align: right;">145</td>
+<td style="text-align: right;">-0.4573553</td>
+<td style="text-align: right;">0.6355545</td>
+<td style="text-align: right;">0.4717614</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Low density lipoprotein cholesterol levels || id:ebi-a-GCST90002412</td>
+<td style="text-align: right;">313</td>
+<td style="text-align: right;">-0.0816894</td>
+<td style="text-align: right;">0.1385080</td>
+<td style="text-align: right;">0.5553372</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Age at menarche || id:ieu-b-5136</td>
+<td style="text-align: right;">452</td>
+<td style="text-align: right;">-0.0635002</td>
+<td style="text-align: right;">0.1103373</td>
+<td style="text-align: right;">0.5649467</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Sex hormone-binding globulin levels adjusted for BMI || id:ebi-a-GCST90012110</td>
+<td style="text-align: right;">411</td>
+<td style="text-align: right;">0.1524303</td>
+<td style="text-align: right;">0.2891447</td>
+<td style="text-align: right;">0.5980708</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Alanine aminotransferase levels || id:ebi-a-GCST90018943</td>
+<td style="text-align: right;">202</td>
+<td style="text-align: right;">-0.1395729</td>
+<td style="text-align: right;">0.2710916</td>
+<td style="text-align: right;">0.6066543</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Aspartate aminotransferase levels || id:ebi-a-GCST90018944</td>
+<td style="text-align: right;">246</td>
+<td style="text-align: right;">-0.1116022</td>
+<td style="text-align: right;">0.2400089</td>
+<td style="text-align: right;">0.6419371</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Total cholesterol levels || id:ebi-a-GCST90018974</td>
+<td style="text-align: right;">169</td>
+<td style="text-align: right;">-0.0894282</td>
+<td style="text-align: right;">0.2006456</td>
+<td style="text-align: right;">0.6558123</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">systolic blood pressure || id:ieu-b-38</td>
+<td style="text-align: right;">450</td>
+<td style="text-align: right;">-0.0045402</td>
+<td style="text-align: right;">0.0112613</td>
+<td style="text-align: right;">0.6868257</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Hematocrit || id:ebi-a-GCST90002304</td>
+<td style="text-align: right;">443</td>
+<td style="text-align: right;">-0.0468176</td>
+<td style="text-align: right;">0.1693605</td>
+<td style="text-align: right;">0.7822122</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Trunk fat mass || id:ukb-b-20044</td>
+<td style="text-align: right;">409</td>
+<td style="text-align: right;">-0.0471682</td>
+<td style="text-align: right;">0.2023606</td>
+<td style="text-align: right;">0.8156918</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Eosinophil counts || id:ebi-a-GCST90002381</td>
+<td style="text-align: right;">382</td>
+<td style="text-align: right;">-0.0291099</td>
+<td style="text-align: right;">0.1510988</td>
+<td style="text-align: right;">0.8472295</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Diabetic retinopathy (DM_RETINOPATHY) || id:finn-b-DM_RETINOPATHY</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">0.0304540</td>
+<td style="text-align: right;">0.2204657</td>
+<td style="text-align: right;">0.8901337</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb291"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb291-1"><a href="#cb291-1" aria-hidden="true" tabindex="-1"></a>phewas_mrs_res <span class="ot">&lt;-</span> <span class="fu">mr_singlesnp</span>(alldat)</span>
+<span id="cb291-2"><a href="#cb291-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mr_forest_plot</span>(phewas_mrs_res)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[[1]]</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Removed 1 row containing missing values or values outside the scale range
+(`geom_point()`).</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="phewas-followup_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+[[2]]</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Removed 1 row containing missing values or values outside the scale range
+(`geom_point()`).</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="phewas-followup_files/figure-html/unnamed-chunk-10-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+[[3]]</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Removed 1 row containing missing values or values outside the scale range
+(`geom_point()`).</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="phewas-followup_files/figure-html/unnamed-chunk-10-3.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+[[4]]</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Removed 1 row containing missing values or values outside the scale range
+(`geom_point()`).</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="phewas-followup_files/figure-html/unnamed-chunk-10-4.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+[[5]]</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Removed 1 row containing missing values or values outside the scale range
+(`geom_point()`).</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="phewas-followup_files/figure-html/unnamed-chunk-10-5.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+[[6]]</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Removed 1 row containing missing values or values outside the scale range
+(`geom_point()`).</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="phewas-followup_files/figure-html/unnamed-chunk-10-6.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+[[7]]</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Removed 1 row containing missing values or values outside the scale range
+(`geom_point()`).</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="phewas-followup_files/figure-html/unnamed-chunk-10-7.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+[[8]]</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Removed 1 row containing missing values or values outside the scale range
+(`geom_point()`).</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="phewas-followup_files/figure-html/unnamed-chunk-10-8.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+[[9]]</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Removed 1 row containing missing values or values outside the scale range
+(`geom_point()`).</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="phewas-followup_files/figure-html/unnamed-chunk-10-9.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+[[10]]</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Removed 1 row containing missing values or values outside the scale range
+(`geom_point()`).</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="phewas-followup_files/figure-html/unnamed-chunk-10-10.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+[[11]]</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Removed 1 row containing missing values or values outside the scale range
+(`geom_point()`).</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="phewas-followup_files/figure-html/unnamed-chunk-10-11.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+[[12]]</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Removed 1 row containing missing values or values outside the scale range
+(`geom_point()`).</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="phewas-followup_files/figure-html/unnamed-chunk-10-12.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+[[13]]</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Removed 1 row containing missing values or values outside the scale range
+(`geom_point()`).</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="phewas-followup_files/figure-html/unnamed-chunk-10-13.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+[[14]]</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Removed 1 row containing missing values or values outside the scale range
+(`geom_point()`).</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="phewas-followup_files/figure-html/unnamed-chunk-10-14.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+[[15]]</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Removed 1 row containing missing values or values outside the scale range
+(`geom_point()`).</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="phewas-followup_files/figure-html/unnamed-chunk-10-15.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+[[16]]</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Removed 1 row containing missing values or values outside the scale range
+(`geom_point()`).</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="phewas-followup_files/figure-html/unnamed-chunk-10-16.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+[[17]]</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Removed 1 row containing missing values or values outside the scale range
+(`geom_point()`).</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="phewas-followup_files/figure-html/unnamed-chunk-10-17.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+[[18]]</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Removed 1 row containing missing values or values outside the scale range
+(`geom_point()`).</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="phewas-followup_files/figure-html/unnamed-chunk-10-18.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+[[19]]</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Removed 1 row containing missing values or values outside the scale range
+(`geom_point()`).</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="phewas-followup_files/figure-html/unnamed-chunk-10-19.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+[[20]]</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Removed 1 row containing missing values or values outside the scale range
+(`geom_point()`).</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="phewas-followup_files/figure-html/unnamed-chunk-10-20.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+[[21]]</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Removed 1 row containing missing values or values outside the scale range
+(`geom_point()`).</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="phewas-followup_files/figure-html/unnamed-chunk-10-21.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+[[22]]</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Removed 1 row containing missing values or values outside the scale range
+(`geom_point()`).</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="phewas-followup_files/figure-html/unnamed-chunk-10-22.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+[[23]]</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Removed 1 row containing missing values or values outside the scale range
+(`geom_point()`).</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="phewas-followup_files/figure-html/unnamed-chunk-10-23.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+[[24]]</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Removed 1 row containing missing values or values outside the scale range
+(`geom_point()`).</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="phewas-followup_files/figure-html/unnamed-chunk-10-24.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+[[25]]</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Removed 1 row containing missing values or values outside the scale range
+(`geom_point()`).</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="phewas-followup_files/figure-html/unnamed-chunk-10-25.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+[[26]]</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Removed 1 row containing missing values or values outside the scale range
+(`geom_point()`).</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="phewas-followup_files/figure-html/unnamed-chunk-10-26.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
