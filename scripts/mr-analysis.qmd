@@ -50,3 +50,43 @@ outgwas <- fread(here("data", "GBC-Phase-1-All_OR.assoc.logistic_Anand_Iyer.csv.
 
 manhattan(outgwas, chr="CHR", bp="BP", snp="SNP", p="P", main="Gall bladder cancer GWAS")
 ```
+
+
+
+```{r}
+out_dat <- read_outcome_data(
+  snps = exp_dat$SNP,
+  filename = here("data/G2_N_1875_withHLA_META-with_G1_O_48_withHLA_BothBeagle.meta_with-BETA.csv_With_BETA-SE-OR_n_ConfIntervals_95_with-AllelFreqs-CombinedData_WithrsID.csv"),
+  sep = ",",
+  snp_col = "SNP",
+  beta_col = "BETA",
+  se_col = "SE",
+  effect_allele_col = "A1_MinorAllele",
+  other_allele_col = "A2_MajorAllele",
+  eaf_col="A1_MinorAlleleFreq",
+  pval_col = "P(WZ)"
+)
+str(out_dat)
+```
+
+
+```{r}
+dat <- harmonise_data(exp_dat, out_dat, action = 1)
+table(dat$id.exposure)
+```
+
+
+```{r}
+mr(dat, method_list="mr_ivw")
+```
+
+
+```{r}
+outgwas <- fread(here("data/G2_N_1875_withHLA_META-with_G1_O_48_withHLA_BothBeagle.meta_with-BETA.csv_With_BETA-SE-OR_n_ConfIntervals_95_with-AllelFreqs-CombinedData_WithrsID.csv"))
+manhattan(outgwas, chr="CHR", bp="BP", snp="SNP", p="P(WZ)", main="Gall bladder cancer GWAS")
+```
+
+
+To add:
+
+ gall stone, ALT levels, BMI and cholesterol 

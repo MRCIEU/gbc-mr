@@ -1,0 +1,180 @@
+---
+title: MR-PheWAS follow-up analysis on gall bladder cancer
+author: "Gibran Hemani"
+date: "2024-08-13"
+execute:
+  cache: true
+format:
+  html:
+    embed-resources: true
+---
+
+We can follow the example in https://explodecomputer.github.io/lab-book/posts/2026-05-22-phewas-example/chd_example.html
+
+Load libraries
+
+```{r}
+library(here)
+library(TwoSampleMR)
+library(ieugwasr)
+library(dplyr)
+library(data.table)
+library(qqman)
+library(knitr)
+library(ggplot2)
+```
+
+Load the GBC GWAS sent to me:
+
+```{r}
+outgwas <- fread(here("data/G2_N_1875_withHLA_META-with_G1_O_48_withHLA_BothBeagle.meta_with-BETA.csv_With_BETA-SE-OR_n_ConfIntervals_95_with-AllelFreqs-CombinedData_WithrsID.csv"))
+str(outgwas)
+# outgwas$A1 <- outgwas$A1_MinorAllele
+# outgwas$P <- outgwas$`P(WZ)`
+```
+
+Get the PheWAS results sent to me previously, and lookup the SNPs used in the PheWAS:
+
+```{r}
+phewas_result <- fread(here("data/phewas/10_phewas_results_of_8_lead_snps_GBC.csv"))
+subset(outgwas, SNP %in% phewas_result$rsid, select=c("SNP", "P"))
+str(phewas_result)
+```
+
+These are very weakly associated with GBC. We can try to do a follow up analysis for illustration purposes but it will be difficult to interpret.
+
+```{r}
+phewas_followup <- fread(here("data/gbc-traits-from-phewas.csv"), header=FALSE)
+phewas_followup <- inner_join(phewas_result, phewas_followup, by=c("id"="V1")) %>%
+  select(id, rsid, trait, p) %>%
+  arrange(p)
+str(phewas_followup)
+```
+
+Format GBC dataset
+
+```{r}
+outgwasf <- format_data(as.data.frame(outgwas), type="outcome", snp_col="SNP", beta_col="BETA", se_col="SE", effect_allele_col="A1_MinorAllele", other_allele_col="A2_MajorAllele", eaf_col="A1_MinorAlleleFreq", pval_col="P(WZ)", chr_col="CHR", pos_col="BP")
+str(outgwasf)
+```
+
+Do the whole PheWAS follow-up analysis. For each trait, get the instruments, then for each instrument get the GBC SNPs that associate with it. Then for each target SNP-int pair make two exposure datasets, one using the target SNP, the other using all other SNPs.
+
+```{r, eval=FALSE}
+allintids <- phewas_followup$id
+
+# Get instrument sets for all of these traits
+int_inst <- extract_instruments(outcomes = allintids)
+
+int_chd <- lapply(allintids, \(x) {
+  extract_outcome_data(snps = phewas_result$rsid, outcomes = x) %>%
+    filter(pval.outcome < 5e-8) %>%
+    distinct( )
+})
+
+int_chd <- bind_rows(int_chd)
+
+table(int_chd$id.outcome)
+
+# For each int trait, I need to get the GWAS target SNPs that associate with it. Then for each target SNP-int pair I need to make two exposure datasets, one using the target SNP, the other using all other SNPs.
+
+make_set <- function(int_chd, int_inst) {
+    dats <- lapply(1:nrow(int_chd), function(i) {
+        snp <- int_chd$SNP[i]
+        int <- int_chd$id.outcome[i]
+        
+        int_dat <- int_inst %>% filter(id.exposure == int)
+        j <- which(outgwasf$SNP == snp)
+        target_region_dat <- int_dat %>%
+            filter(chr.exposure == outgwasf$chr.outcome[j] & abs(pos.exposure - outgwasf$pos.outcome[j]) < 1e6) %>%
+            mutate(
+                id.exposure = paste0("target - ", snp, id.exposure),
+                exposure = paste0("target - ", snp, " - ", exposure)
+            )
+        
+        other_region_dat <- subset(int_dat, !SNP %in% target_region_dat$SNP)
+        
+        bind_rows(other_region_dat, target_region_dat)
+    })
+    names(dats) <- paste(int_chd$SNP, int_chd$id.outcome, sep="_")
+    dats
+}
+
+exp_sets <- make_set(int_chd, int_inst)
+
+outdat <- subset(outgwasf, SNP %in% int_inst$SNP)
+str(outdat)
+# phewas_result <- phewas(chd$SNP)
+save(outdat, exp_sets, int_chd, int_inst, int_chd, outgwasf, phewas_result, file = here("data/gbc_phewas_results-g2.Rdata"))
+```
+
+
+```{r}
+load(here("data/gbc_phewas_results-g2.Rdata"))
+
+cochran_q <- function(b, se) {
+    w <- 1 / se^2
+    q <- sum(w * (b - sum(w * b) / sum(w))^2)
+    qpval <- pchisq(q, df=length(b)-1, lower.tail=FALSE)
+    list(q=q, p=qpval)
+}
+
+res_sets <- lapply(exp_sets, function(exp_set) {
+    dat <- harmonise_data(exp_set, outdat, action = 1)
+    o <- mr(dat, method_list=c("mr_ivw", "mr_wald_ratio"))
+    if(nrow(o) != 2) return(NULL)
+    expname <- o$exposure[!grepl("target", o$exposure)]
+    expname <- strsplit(expname, "\\|")[[1]][1]
+    o$int_trait <- expname
+    rsid <- o$exposure[grepl("target", o$exposure)] %>% {strsplit(., " - ")[[1]][2]}
+    o$rsid <- rsid
+    o$exposure[grepl(rsid, o$exposure)] <- rsid
+    ind <- !grepl(rsid, o$exposure)
+    o$exposure[ind] <- "All other SNPs"
+    qres <- cochran_q(o$b, o$se)
+    o$cochran_q <- qres$q
+    o$cochran_p <- qres$p
+    o$cochran_q[ind] <- 1
+    o$cochran_p[ind] <- 1
+    
+    o
+})
+
+plot_int <- function(res_sets, int_id) {
+    # keep mr_results that grepl int_name in the exposure name
+    rs <- bind_rows(res_sets)
+    ggplot(rs, aes(x=b, y=exposure)) +
+    geom_point(aes(colour = cochran_p < 0.05)) +
+    geom_errorbarh(aes(xmin=b-1.96*se, xmax=b+1.96*se, colour = cochran_p < 0.05), height=0) +
+    geom_vline(xintercept=0, linetype="dashed", color="red") +
+    labs(x="MR Estimate (log OR)", y="Target region") +
+    facet_wrap(int_trait ~ ., scales = "free", ncol=1, space="free_y") +
+    scale_colour_manual(values=c("black", "red"), labels=c("Cochran's Q p >= 0.05", "Cochran's Q p < 0.05")) +
+    theme(axis.text.y = element_text(size=10))
+}
+
+plot_int(res_sets, 1)
+ggsave(here("figures/phewas_followup_results-g2.pdf"), width=8, height=30)
+```
+
+```{r}
+bind_rows(res_sets) %>% filter(exposure == "All other SNPs") %>% select(int_trait, b, se, pval) %>% arrange(pval)
+```
+
+
+Do the simpler analysis - just MR of phewas hits on GBC without the target SNPs
+
+```{r}
+expdat <- bind_rows(exp_sets) %>% filter(!grepl("target", exposure)) %>% filter(!duplicated(paste(id.exposure, SNP)))
+
+alldat <- harmonise_data(expdat, outgwasf, action = 1)
+phewas_mr_res <- mr(alldat, method_list=c("mr_ivw", "mr_wald_ratio"))
+
+phewas_mr_res %>% select(exposure, nsnp, b, se, pval) %>% arrange(pval) %>% kable()
+```
+
+
+```{r}
+phewas_mrs_res <- mr_singlesnp(alldat)
+mr_forest_plot(phewas_mrs_res)
+```

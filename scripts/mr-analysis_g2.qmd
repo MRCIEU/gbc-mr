@@ -1,0 +1,54 @@
+---
+title: MR analysis on gall bladder cancer
+author: "Gibran Hemani"
+date: "2024-08-13"
+format:
+  html:
+    embed-resources: true
+---
+
+GWAS summary statistics provided: `GBC-Phase-1-All_OR.assoc.logistic Anand Iyer.csv`
+
+```{r}
+library(TwoSampleMR)
+library(ieugwasr)
+library(dplyr)
+library(here)
+library(data.table)
+library(qqman)
+exp_ids <- c("ieu-b-5135", "ebi-a-GCST90029037", "ukb-b-2227", "ieu-b-5122", "ebi-a-GCST90000050")
+exp_dat <- extract_instruments(exp_ids)
+```
+
+```{r}
+outgwas <- fread(here("data/G2_N_1875_withHLA_META-with_G1_O_48_withHLA_BothBeagle.meta_with-BETA.csv_With_BETA-SE-OR_n_ConfIntervals_95_with-AllelFreqs-CombinedData_WithrsID.csv"))
+```
+
+
+```{r}
+
+out_dat <- subset(outgwas, SNP %in% exp_dat$SNP) %>%
+    as.data.frame() %>%
+    format_data(., 
+        type="outcome",
+        snp_col = "SNP",
+        beta_col = "BETA",
+        se_col = "SE",
+        effect_allele_col = "A1_MinorAllele",
+        other_allele_col = "A2_MajorAllele",
+        eaf_col="A1_MinorAlleleFreq",
+        pval_col = "P(WZ)"
+    )
+str(out_dat)
+```
+
+
+```{r}
+dat <- harmonise_data(exp_dat, out_dat, action = 1)
+table(dat$id.exposure)
+```
+
+
+```{r}
+mr(dat, method_list="mr_ivw")
+```
