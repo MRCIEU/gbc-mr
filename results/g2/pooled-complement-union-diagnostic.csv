@@ -1,0 +1,6 @@
+mediator_id,n_targets,n_old_complement_union,n_correct_retained,n_reintroduced,reintroduced_snps,diagnostic
+ebi-a-GCST90002346,2,528,520,8,rs1354034;rs11712256;rs41433248;rs67824942;rs9378249;rs62395851;rs114164395;rs111511435,Old union-of-complements versus complete target-locus union; saved associations only
+ebi-a-GCST90002402,3,536,528,8,rs1354034;rs9266658;rs2046823;rs1602456;rs62251184;rs9272445;rs9264781;rs165177,Old union-of-complements versus complete target-locus union; saved associations only
+ebi-a-GCST90002412,2,357,352,5,rs4299376;rs6709904;rs185263492;rs17031776;rs4148810,Old union-of-complements versus complete target-locus union; saved associations only
+ebi-a-GCST90018819,3,49,43,6,rs75331444;rs28473566;rs4148805;rs55726838;rs6544721;rs56363382,Old union-of-complements versus complete target-locus union; saved associations only
+finn-b-K11_GALLBILPANC,2,27,22,5,rs76866386;rs17031494;rs114041253;rs11124977;rs12672720,Old union-of-complements versus complete target-locus union; saved associations only
