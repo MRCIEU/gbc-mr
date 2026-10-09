@@ -51,7 +51,7 @@ compute_decomposition <- function(comparisons) {
   component_ok <- list(total = total_ok, indirect = indirect_ok,
                        residual = total_ok & indirect_ok)
   base_reason <- c(total = 'Missing/unusable total association, standard error or effect allele',
-                   indirect = 'Missing/unusable mediator association, per-target comparator, standard error, mediator scale or effect allele',
+                   indirect = 'Missing/unusable mediator association, shared mediator comparator, standard error, mediator scale or effect allele',
                    residual = 'Total and indirect components are both required')
   for (component in names(component_ok)) {
     ok <- component_ok[[component]]

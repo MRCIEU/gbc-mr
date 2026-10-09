@@ -80,7 +80,7 @@ run_offline_analysis <- function(input_path = "data/gbc_phewas_results-g2.Rdata"
   provenance <- data.frame(input = input_path, md5 = unname(tools::md5sum(input_path)),
     retained_pairs = nrow(pairs), mediators = nrow(pooled), targets = length(unique(pairs$target_snp)),
     original_lead_snps = length(original_snps),
-    policy = "Exact SNP; +/-1 Mb geographic exclusion; all palindromes removed; no remote access or result cache")
+    policy = "Exact SNP; shared mediator comparator excluding all known GBC leads and +/-1 Mb; all palindromes removed; no remote access or result cache")
   write.csv(provenance, file.path(output_dir, "provenance.csv"), row.names = FALSE)
   versions <- data.frame(package = c("R", "TwoSampleMR", "ieugwasr", "knitr", "rmarkdown"),
     version = c(as.character(getRversion()), vapply(c("TwoSampleMR", "ieugwasr", "knitr", "rmarkdown"),

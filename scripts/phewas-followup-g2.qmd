@@ -58,8 +58,13 @@ Genome-wide significance alone does not establish instrument validity.
 
 Every target estimate uses exactly its named SNP in `int_chd`, harmonised with the
 full saved GBC outcome `outgwasf`. The comparator is rebuilt from that mediator's
-saved instruments, excluding the target and **±1 Mb**, inclusive, before outcome
-matching and harmonisation. Saved coordinate mismatches and missing instrument
+saved instruments, excluding **all eight known GBC lead SNPs and their ±1 Mb
+regions**, inclusive, before outcome matching and harmonisation. This includes
+original leads without retained mediator follow-up pairs. Each mediator has one
+shared comparator estimate and instrument set, reused for every exact-hit Q test,
+pooled MR and decomposition. Known outcome hits cannot become comparator instruments
+for another exact hit. The figure shows one panel per mediator, with every retained
+exact hit and a single other-SNP estimate. Saved coordinate mismatches and missing instrument
 coordinates are excluded. A geographic window does not prove LD independence;
 there is no fetched LD reference or genome-build conversion. The supplement includes
 ±2 Mb and additional chromosome 6 25–34 Mb MHC exclusions where relevant.
@@ -94,10 +99,10 @@ for (path in analysis$plots$comparisons) cat(sprintf("\n![Exact-hit comparison](
 
 ## Pooled mediator MR
 
-Pooled MR excludes the **union of every target locus for each mediator directly
-from its saved instruments**. A SNP excluded for one target cannot return through
-another target's complement. This distinct summary is never substituted for the
-per-target comparator used in decomposition.
+Pooled MR uses the **same all-GBC-hit-excluded estimate as the shared comparator**.
+Each mediator contributes one pooled-family test, while its exact-hit comparisons
+contribute one Q test per retained SNP. A SNP excluded for one GBC hit cannot return
+through another hit's complement.
 
 ```{r}
 show_table(data.frame(mediator = pooled$mediator, targets = pooled$n_targets,
@@ -120,7 +125,7 @@ for (path in analysis$plots$pooled) cat(sprintf("\n![Pooled mediator MR](../%s)\
 ## Total, indirect and residual direct components
 
 For each pair: **t = G→GBC**, **i = a × b**, **d = t − i**, where a is the exact
-G→mediator association and b is that target's other-instruments MR. Components share
+G→mediator association and b is the mediator's shared all-GBC-hit-excluded MR. Components share
 GBC log-odds units per recorded target effect allele. Opposing signs are retained;
 missing components are never zero. The pipeline validates t = i + d for every
 complete pair.

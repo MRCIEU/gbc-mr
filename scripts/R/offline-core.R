@@ -67,6 +67,28 @@ canonical_pairs <- function(inputs) {
   pairs[order(pairs$mediator_id, pairs$target_snp), , drop = FALSE]
 }
 
+# The original lead inventory includes hits without retained mediator pairs.
+# Geographic exclusions use this complete inventory for every mediator.
+known_gbc_loci <- function(inputs) {
+  snps <- sort(unique(c(as.character(inputs$phewas_result$rsid),
+                        as.character(inputs$int_chd$SNP))))
+  snps <- snps[!is.na(snps) & nzchar(snps)]
+  loci <- data.frame(target_snp = snps, target_chr = NA_character_, target_pos = NA_real_)
+  for (i in seq_along(snps)) {
+    saved <- inputs$outgwasf[inputs$outgwasf$SNP == snps[i], , drop = FALSE]
+    exact <- inputs$int_chd[inputs$int_chd$SNP == snps[i], , drop = FALSE]
+    coords <- rbind(offline_coord(saved, "outcome"), offline_coord(exact, "outcome"))
+    # Any usable saved coordinate may establish the locus, but conflicting
+    # coordinates cannot certify the geographic exclusion without a build map.
+    coords <- unique(coords[!is.na(coords$chr) & nzchar(coords$chr) & is.finite(coords$pos), ])
+    if (nrow(coords) == 1L) {
+      loci$target_chr[i] <- coords$chr
+      loci$target_pos[i] <- coords$pos
+    }
+  }
+  loci
+}
+
 select_instruments <- function(inputs, mediator_id, target_snps,
                                window_bp = 1e6, mhc = FALSE) {
   stopifnot(length(mediator_id) == 1L, is.finite(window_bp), window_bp >= 0)
@@ -74,18 +96,16 @@ select_instruments <- function(inputs, mediator_id, target_snps,
   dd <- offline_deduplicate(raw, "exposure")
   inst <- dd$data
   coords <- offline_coord(inst, "exposure")
-  pairs <- canonical_pairs(inputs)
-  loci <- unique(pairs[pairs$mediator_id == mediator_id & pairs$target_snp %in% target_snps,
-                       c("target_snp", "target_chr", "target_pos")])
+  loci <- known_gbc_loci(inputs)
   if (!all(target_snps %in% loci$target_snp) ||
-      any(is.na(loci$target_chr) | !is.finite(loci$target_pos))) {
-    stop("Target coordinates unavailable: cannot establish geographic exclusions")
+      !nrow(loci) || any(is.na(loci$target_chr) | loci$target_chr == "" | !is.finite(loci$target_pos))) {
+    stop("Known GBC hit coordinates unavailable or conflicting: cannot establish geographic exclusions")
   }
   reason <- rep(NA_character_, nrow(inst))
   mark <- function(which, value) {
     reason[which & is.na(reason)] <<- value
   }
-  mark(inst$SNP %in% target_snps, "target")
+  mark(inst$SNP %in% loci$target_snp, "target")
   mark(is.na(coords$chr) | coords$chr == "" | !is.finite(coords$pos), "coordinate_missing")
   out <- offline_deduplicate(inputs$outgwasf, "outcome")$data
   j <- match(inst$SNP, out$SNP)
@@ -117,6 +137,8 @@ select_instruments <- function(inputs, mediator_id, target_snps,
   excluded$exclusion_reason <- reason[!is.na(reason)]
   kept <- inst[is.na(reason), , drop = FALSE]
   counts$retained_SNPs <- paste(kept$SNP, collapse = ";")
+  counts$n_exclusion_loci <- nrow(loci)
+  counts$excluded_locus_snps <- paste(loci$target_snp, collapse = ";")
   list(instruments = kept, excluded_instruments = excluded, counts = counts,
        duplicate_conflict_snps = dd$conflicts)
 }
@@ -225,6 +247,31 @@ estimate_mr <- function(dat) {
 
 compute_comparisons <- function(inputs, window_bp = 1e6, mhc = FALSE) {
   pairs <- canonical_pairs(inputs)
+  mediator_ids <- unique(pairs$mediator_id)
+  loci <- known_gbc_loci(inputs)
+  comparators <- setNames(lapply(mediator_ids, function(mediator_id) {
+    targets <- unique(pairs$target_snp[pairs$mediator_id == mediator_id])
+    selected <- tryCatch(select_instruments(inputs, mediator_id, targets,
+                                            window_bp, mhc), error = identity)
+    if (inherits(selected, "error")) {
+      comparator <- estimate_mr(data.frame())
+      comparator$reason <- conditionMessage(selected)
+      counts <- data.frame(n_saved = sum(inputs$int_inst$id.exposure == mediator_id),
+                           n_duplicates_removed = NA_integer_, n_duplicate_conflicts = NA_integer_,
+                           n_excluded_target = NA_integer_, n_excluded_region = NA_integer_,
+                           n_excluded_mhc = NA_integer_, n_excluded_coordinate_missing = NA_integer_,
+                           n_excluded_coordinate_mismatch = NA_integer_, n_retained = NA_integer_,
+                           retained_SNPs = "", n_exclusion_loci = nrow(loci),
+                           excluded_locus_snps = paste(loci$target_snp, collapse = ";"))
+      hc <- attr(harmonise_local(inputs$int_inst[FALSE, ], inputs$outgwasf), "counts")
+    } else {
+      comp_h <- harmonise_local(selected$instruments, inputs$outgwasf)
+      comparator <- estimate_mr(comp_h)
+      counts <- selected$counts
+      hc <- attr(comp_h, "counts")
+    }
+    list(estimate = comparator, counts = counts, harmonisation_counts = hc)
+  }), mediator_ids)
   rows <- lapply(seq_len(nrow(pairs)), function(i) {
     pair <- pairs[i, , drop = FALSE]
     exact <- inputs$int_chd[inputs$int_chd$id.outcome == pair$mediator_id &
@@ -255,24 +302,10 @@ compute_comparisons <- function(inputs, window_bp = 1e6, mhc = FALSE) {
     for (field in c("b", "se", "pval", "lo", "hi", "nsnp", "method", "F_min", "F_mean", "n_weak_F")) {
       pair[[paste0("target_", field)]] <- target[[field]]
     }
-    selected <- tryCatch(select_instruments(inputs, pair$mediator_id, pair$target_snp,
-                                            window_bp, mhc), error = identity)
-    if (inherits(selected, "error")) {
-      comparator <- estimate_mr(data.frame())
-      comparator$reason <- conditionMessage(selected)
-      counts <- data.frame(n_saved = sum(inputs$int_inst$id.exposure == pair$mediator_id),
-                           n_duplicates_removed = NA_integer_, n_duplicate_conflicts = NA_integer_,
-                           n_excluded_target = NA_integer_, n_excluded_region = NA_integer_,
-                           n_excluded_mhc = NA_integer_, n_excluded_coordinate_missing = NA_integer_,
-                           n_excluded_coordinate_mismatch = NA_integer_, n_retained = NA_integer_,
-                           retained_SNPs = "")
-      hc <- attr(harmonise_local(inputs$int_inst[FALSE, ], inputs$outgwasf), "counts")
-    } else {
-      comp_h <- harmonise_local(selected$instruments, inputs$outgwasf)
-      comparator <- estimate_mr(comp_h)
-      counts <- selected$counts
-      hc <- attr(comp_h, "counts")
-    }
+    shared <- comparators[[pair$mediator_id]]
+    comparator <- shared$estimate
+    counts <- shared$counts
+    hc <- shared$harmonisation_counts
     for (field in c("b", "se", "pval", "lo", "hi", "nsnp", "method", "F_min", "F_mean", "n_weak_F", "status", "reason")) {
       pair[[paste0("comparator_", field)]] <- comparator[[field]]
     }

@@ -3,6 +3,7 @@
 
 compute_pooled <- function(inputs, window_bp = 1e6, mhc = FALSE) {
   pairs <- canonical_pairs(inputs)
+  loci <- known_gbc_loci(inputs)
   mediators <- unique(pairs[, c("mediator_id", "mediator", "mediator_scale")])
   rows <- lapply(seq_len(nrow(mediators)), function(i) {
     med <- mediators[i, , drop = FALSE]
@@ -59,6 +60,8 @@ compute_pooled <- function(inputs, window_bp = 1e6, mhc = FALSE) {
         mediator_id = med$mediator_id,
         mediator = med$mediator,
         mediator_scale = med$mediator_scale,
+        n_exclusion_loci = nrow(loci),
+        excluded_locus_snps = paste(loci$target_snp, collapse = ";"),
         n_targets = length(targets),
         target_snps = paste(targets, collapse = ";"),
         window_bp = window_bp,

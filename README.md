@@ -19,24 +19,27 @@ with candidate GWAS selected in [the saved trait list](data/gbc-traits-from-phew
 No new empirical associations or LD references are fetched.
 
 The exact target is harmonised by its named SNP against the full saved GBC outcome.
-Other-instruments MR excludes that SNP and its inclusive ±1 Mb region. Pooled MR
-instead excludes the union of **all** of a mediator's target loci before
-harmonisation. The [regression diagnostic](results/g2/pooled-complement-union-diagnostic.csv)
+Every mediator's other-instruments MR excludes **all eight known GBC leads and
+their inclusive ±1 Mb regions**, including leads without retained follow-up pairs.
+One estimate and instrument set is shared across all that mediator's exact-hit
+comparisons, pooled MR and decomposition. The follow-up figure has one panel per
+mediator, showing its exact hits and a single other-SNP estimate. The
+[regression diagnostic](results/g2/pooled-complement-union-diagnostic.csv)
 shows that the former union-of-complements approach reintroduced 32 excluded rows
 across five mediators. All palindromic variants are conservatively removed;
 coordinate mismatches, missingness and instrument-strength diagnostics are recorded.
 Geographic exclusions do not establish LD independence, especially in the MHC.
 
-**32 of 33 unique pairs** have BH-adjusted heterogeneity P < 0.05. This indicates
+**All 33 unique pairs** have BH-adjusted heterogeneity P < 0.05. This indicates
 incompatibility with a common-effect/full-mediation model under its assumptions;
-it does not locate a direct pathway. The remaining pair has no detected
-heterogeneity, with mediation unresolved. Invalid instruments, LD and population
+it does not locate a direct pathway. Invalid instruments, LD and population
 or scale differences remain alternative explanations.
 
 **None of the 26 pooled mediator estimates passes BH at 0.05.** Platelet count has
-estimate 0.211 (SE 0.0894), nominal P = 0.0182 and BH P = 0.0948 after eight regional
-instruments are excluded. Cholelithiasis and gallbladder/biliary/pancreatic disorders
-have pooled BH P approximately 0.0512. These are candidate explanations with
+estimate 0.211 (SE 0.0897), nominal P = 0.0188 and BH P = 0.0976 after ten regional
+instruments are excluded (405 harmonised instruments remain). Cholelithiasis and
+gallbladder/biliary/pancreatic disorders
+have pooled BH P approximately 0.0504. These are candidate explanations with
 uncertainty, not demonstrated mediating pathways. The named testing families are
 corrected separately, without a claim of global control across families.
 
@@ -80,5 +83,6 @@ rmarkdown. There is no remote installation step. [Package versions](results/g2/p
 and [session information](results/g2/session-info.txt) document the render environment.
 All results are recomputed with caches disabled and remote APIs/downloads blocked.
 Tests validate exact membership, duplicate/conflicting rows, allele reversal,
-exclusions, pooled union regression, unavailable inputs and decomposition uncertainty.
+all-hit exclusions, shared comparator consistency, pooled union regression,
+unavailable inputs and decomposition uncertainty.
 The older [G1 workflow](scripts/phewas-followup.qmd) remains unchanged.

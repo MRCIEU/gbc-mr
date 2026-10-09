@@ -16,7 +16,10 @@ demonstrated <- FALSE
 for (mediator_id in multi_target) {
   targets <- unique(pairs$target_snp[pairs$mediator_id == mediator_id])
   per_target_complements <- lapply(targets, function(target) {
-    select_instruments(inputs, mediator_id, target, window_bp = 1e6)$instruments$SNP
+    historical <- inputs
+    historical$int_chd <- inputs$int_chd[inputs$int_chd$SNP == target, ]
+    historical$phewas_result <- data.frame(rsid = target)
+    select_instruments(historical, mediator_id, target, window_bp = 1e6)$instruments$SNP
   })
   old_complement_union <- unique(unlist(per_target_complements, use.names = FALSE))
   corrected <- select_instruments(inputs, mediator_id, targets, window_bp = 1e6)
