@@ -1,0 +1,2 @@
+"input","md5","retained_pairs","mediators","targets","original_lead_snps","policy"
+"data/offline-g2-inputs.rds","3140a85d4192c4fdd13e14a153a1931f",33,26,6,8,"Exact SNP; shared mediator comparator excluding all known GBC leads and +/-1 Mb; all palindromes removed; no remote access or result cache"
