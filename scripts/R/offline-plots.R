@@ -23,7 +23,8 @@ draw_estimates <- function(b, lo, hi, labels, colours, title, subtitle, xlab) {
 
 export_pages <- function(path, n, per_page, draw_page, width = 10, height = 11) {
   pages <- split(seq_len(n), ceiling(seq_len(n) / per_page))
-  grDevices::pdf(path, width = width, height = height, onefile = TRUE)
+  # Embed fonts so publication PDFs preserve spacing across viewers/platforms.
+  grDevices::cairo_pdf(path, width = width, height = height, onefile = TRUE)
   tryCatch(for (page in seq_along(pages)) draw_page(pages[[page]], page, length(pages)),
     finally = grDevices::dev.off())
   pngs <- character(length(pages))
