@@ -91,6 +91,9 @@ run_offline_analysis <- function(input_path = "data/gbc_phewas_results-g2.Rdata"
       file.path(figures_dir, "phewas_followup_results-g2.pdf")),
     decomposition = export_decomposition_plot(decomposition,
       file.path(figures_dir, "phewas_decomposition-g2.pdf")),
+    decomposition_selected = export_selected_decomposition_plot(decomposition,
+      file.path(figures_dir, "phewas_decomposition-selected-g2.pdf"),
+      c("ebi-a-GCST90018819", "ieu-a-832", "ebi-a-GCST90002402")),
     pooled = export_pooled_plot(pooled, file.path(figures_dir, "phewas_pooled_mr-g2.pdf")))
   list(inputs = inputs, pairs = pairs, comparisons = comparisons, pooled = pooled,
     decomposition = decomposition, summary = summary, tables = tables, plots = plots,

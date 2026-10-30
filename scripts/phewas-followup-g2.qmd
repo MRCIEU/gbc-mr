@@ -157,6 +157,50 @@ show_table(data.frame(SNP = decomposition$target_snp, mediator = decomposition$m
 for (path in analysis$plots$decomposition) cat(sprintf("\n![Effect decomposition](../%s)\n\n", path))
 ```
 
+The same components for cholelithiasis, rheumatoid arthritis and platelet count, the
+mediators with the strongest pooled MR evidence, on one shared axis.
+
+```{r results='asis'}
+for (path in analysis$plots$decomposition_selected) cat(sprintf("\n![Selected effect decomposition](../%s)\n\n", path))
+```
+
+## Share of each lead's effect through its mediators
+
+Produced by `scripts/mvmr-mediation.R`, which reads the outputs above and MVMR
+instruments saved from OpenGWAS in `data/mvmr-inputs.rds`. Candidate mediators are
+those with pooled MR P < 0.05; gallbladder/biliary/pancreas disorders is folded into
+cholelithiasis as the same liability. A lead with one candidate mediator keeps its
+univariable decomposition. rs35604230 has three (platelet count, rheumatoid
+arthritis, diastolic blood pressure), so their effects on GBC are estimated jointly
+by MVMR and the indirect effects through the set are summed: *t* = Σ *a*ⱼ*b*ⱼ + *d*.
+Selecting mediators on nominal P from the same GBC data inflates *b*, so the
+mediated shares are exploratory.
+
+```{r}
+mvmr_estimates <- read.csv("results/g2/mvmr_estimates.csv")
+mediated_share <- read.csv("results/g2/mediated_share.csv")
+show_table(data.frame(SNP = mvmr_estimates$target_snp, analysis = mvmr_estimates$analysis,
+  mediator = mvmr_estimates$mediator,
+  MVMR_b_CI = interval(mvmr_estimates$b, mvmr_estimates$b - 1.96 * mvmr_estimates$se,
+    mvmr_estimates$b + 1.96 * mvmr_estimates$se),
+  conditional_F = round(mvmr_estimates$conditional_F, 1), n = mvmr_estimates$nsnp,
+  univariable_b = signif(mvmr_estimates$univariable_b, 3),
+  same_SNPs_univariable_b = signif(mvmr_estimates$same_snps_univariable_b, 3),
+  own_instruments = mvmr_estimates$same_snps_own_instruments))
+totals <- unique(mediated_share[c("target_snp", "method", "t", "t_lo", "t_hi", "mediated", "mediated_se", "share_mediated")])
+show_table(data.frame(SNP = totals$target_snp, method = totals$method,
+  total_CI = interval(totals$t, totals$t_lo, totals$t_hi),
+  mediated_CI = interval(totals$mediated, totals$mediated - 1.96 * totals$mediated_se,
+    totals$mediated + 1.96 * totals$mediated_se),
+  share_mediated = round(totals$share_mediated, 3)))
+```
+
+Rheumatoid arthritis has conditional F < 10 and only a few of its own instruments
+survive joint clumping, so its MVMR estimate is weak; compare the same-SNP
+univariable estimate before reading its attenuation as evidence of confounding.
+
+![Share of each lead's effect through its mediators](../figures/phewas_mediated_share-g2.png)
+
 ## Interpretation and testing families
 
 Q indicates incompatibility with the common-effect/full-mediation model under its

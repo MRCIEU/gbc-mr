@@ -101,6 +101,53 @@ export_decomposition_plot <- function(x, path) {
   }, width = 12)
 }
 
+# Compact decomposition for chosen mediators: one panel per mediator, a shared
+# GBC log-odds axis so components are comparable across panels.
+export_selected_decomposition_plot <- function(x, path, mediator_ids) {
+  x <- x[x$mediator_id %in% mediator_ids, , drop = FALSE]
+  x <- x[order(match(x$mediator_id, mediator_ids), x$target_snp), , drop = FALSE]
+  colours <- c("#2166ac", "#1b7837", "#b35806")
+  fields <- c("t", "i", "d")
+  bounds <- unlist(x[paste0(rep(fields, each = 2), c("_lo", "_hi"))])
+  limits <- range(c(0, bounds[is.finite(bounds)]))
+  limits <- limits + c(-1, 1) * diff(limits) * 0.05
+  ids <- mediator_ids[mediator_ids %in% x$mediator_id]
+  heights <- vapply(ids, function(id) sum(x$mediator_id == id) + 1.2, numeric(1))
+  draw <- function() {
+    layout(matrix(seq_along(ids)), heights = heights)
+    par(oma = c(2, 0, 2.5, 0), mgp = c(2.2, 0.6, 0))
+    for (k in seq_along(ids)) {
+      z <- x[x$mediator_id == ids[k], , drop = FALSE]
+      y <- rev(seq_len(nrow(z)))
+      last <- k == length(ids)
+      par(mar = c(if (last) 3 else 0.6, 9, 2, 1.5))
+      plot(NA, xlim = limits, ylim = c(0.5, nrow(z) + 0.5), yaxt = "n", xaxt = "n",
+        xlab = "", ylab = "", bty = "n")
+      if (last) {
+        axis(1, cex.axis = 0.85)
+        mtext("GBC log odds per target effect allele", side = 1, line = 2.3, cex = 0.75)
+      }
+      abline(v = 0, lty = 3, col = "grey60")
+      axis(2, at = y, labels = paste0(z$target_snp, " (", z$effect_allele, ")"),
+        las = 1, tick = FALSE, cex.axis = 0.85)
+      for (j in seq_along(fields)) {
+        f <- fields[j]
+        yp <- y + c(0.22, 0, -0.22)[j]
+        segments(z[[paste0(f, "_lo")]], yp, z[[paste0(f, "_hi")]], yp, col = colours[j], lwd = 1.6)
+        points(z[[f]], yp, pch = 19, col = colours[j], cex = 0.85)
+      }
+      mtext(z$mediator[1], side = 3, line = 0.4, adj = 0, font = 2, cex = 0.8)
+    }
+    par(fig = c(0, 1, 0, 1), oma = c(0, 0, 0, 0), mar = c(0, 0, 0, 0), new = TRUE)
+    plot.new()
+    legend("top", horiz = TRUE, bty = "n", cex = 0.85, legend = c("Total", "Indirect", "Residual direct"),
+      col = colours, pch = 19, lwd = 1.6)
+    mtext("95% delta-method CIs; zero-covariance working assumption; each mediator analysed separately.",
+      side = 1, line = -1.4, cex = 0.65)
+  }
+  export_pages(path, 1, 1, function(rows, page, pages) draw(), width = 7, height = 1 + 0.4 * sum(heights))
+}
+
 export_pooled_plot <- function(x, path) {
   export_pages(path, nrow(x), 6, function(rows, page, pages) {
     par(mfrow = c(6, 1), oma = c(2, 0, 3, 0))
