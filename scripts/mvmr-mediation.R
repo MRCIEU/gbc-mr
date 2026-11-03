@@ -189,12 +189,22 @@ fwrite(sensitivity_share, file.path(results_dir, "mediated_share_sensitivity.csv
 
 # ---- Plot -----------------------------------------------------------------
 
-totals <- unique(share[, .(target_snp, method, t, t_lo, t_hi, share_mediated)])
+# Orient every lead to its GBC risk-increasing allele, matching the PheWAS plot.
+# Flipping the allele negates t and every component; the mediated share is unchanged.
+plot_share <- copy(share)
+alleles <- outcome[SNP %in% plot_share$target_snp, .(target_snp = SNP, ea = effect_allele.outcome, oa = other_allele.outcome)]
+plot_share <- merge(plot_share, alleles, by = "target_snp")
+plot_share[, flip := sign(t)]
+plot_share[, risk_allele := ifelse(flip > 0, effect_allele, ifelse(effect_allele == ea, oa, ea))]
+plot_share[, `:=`(t = flip * t, estimate = flip * estimate)]
+plot_share[, `:=`(t_lo = t - z * t_se, t_hi = t + z * t_se)]
+
+totals <- unique(plot_share[, .(target_snp, risk_allele, method, t, t_lo, t_hi, share_mediated)])
 totals <- totals[order(-abs(t))]
 totals[, label := ifelse(is.na(share_mediated), "no mediator",
   sprintf("%s%% mediated", formatC(100 * share_mediated, format = "f", digits = 0)))]
-totals[, snp_label := paste0(target_snp, "\n", method)]
-plot_dat <- merge(share, totals[, .(target_snp, snp_label)], by = "target_snp")
+totals[, snp_label := paste0(target_snp, " (", risk_allele, ")\n", method)]
+plot_dat <- merge(plot_share, totals[, .(target_snp, snp_label)], by = "target_snp")
 plot_dat[, snp_label := factor(snp_label, levels = totals$snp_label)]
 totals[, snp_label := factor(snp_label, levels = totals$snp_label)]
 plot_dat[, component := paste0(toupper(substr(component, 1, 1)), substring(component, 2))]
@@ -214,11 +224,11 @@ p <- ggplot(plot_dat, aes(x = snp_label, y = estimate, fill = component)) +
   geom_point(data = totals, aes(x = snp_label, y = t), inherit.aes = FALSE, size = 2) +
   geom_text(data = totals, aes(x = snp_label, y = label_y, label = label), inherit.aes = FALSE, size = 3) +
   scale_fill_manual(values = fills, name = NULL) +
-  labs(x = NULL, y = "GBC log odds per target effect allele",
+  labs(x = NULL, y = "GBC log odds per risk-increasing allele",
        caption = paste("Bars stack the indirect effect through each mediator and the residual direct effect;",
                        "together they sum to the total (point, 95% CI).",
                        "\nSegments of opposite sign to the total are negative mediation.",
-                       "rs35604230 uses MVMR; others use univariable MR.")) +
+                       "rs35604230 uses MVMR; others use univariable MR. Each lead is oriented to its GBC risk-increasing allele (in brackets).")) +
   theme_minimal(base_size = 11) +
   theme(legend.position = "bottom", panel.grid.major.x = element_blank(),
         plot.caption = element_text(hjust = 0, size = 8))
