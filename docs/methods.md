@@ -37,11 +37,52 @@ All three are expressed in GBC log odds per effect allele. Standard errors came 
 
 ## Effect captured through mediators
 
-To summarise how much of each lead variant's effect runs through its mediators, we took as candidates the mediators whose pooled MR estimate had P < 0.05. We treated cholelithiasis and FinnGen disorders of gallbladder, biliary tract and pancreas as one liability, represented by cholelithiasis. A lead variant with one candidate mediator kept its decomposition from above. For a lead variant with several candidate mediators (rs35604230: platelet count, rheumatoid arthritis and diastolic blood pressure), we estimated the mediators' effects on GBC jointly by multivariable MR (MVMR).
+To summarise how much of each lead variant's effect runs through its mediators, we took as candidates the mediators whose pooled MR estimate had P < 0.05. We treated cholelithiasis and FinnGen disorders of gallbladder, biliary tract and pancreas as one liability, represented by cholelithiasis. A lead variant with one candidate mediator kept its decomposition from above. For a lead variant with several candidate mediators (rs35604230: platelet count, rheumatoid arthritis and diastolic blood pressure), we estimated the mediators' effects on GBC jointly by multivariable MR (MVMR). The partitioning is described below.
 
-MVMR instruments were extracted from OpenGWAS with TwoSampleMR's `mv_extract_exposures()`. This took the union of each mediator's instruments (P < 5 × 10⁻⁸), clumped them jointly (r² < 0.001, 10 Mb) and looked up each SNP in every mediator GWAS, without proxies. As before, we removed palindromic variants and all variants within ±1 Mb of any GBC lead. Conditional effects were estimated by IVW multivariable regression with multiplicative random effects. Instrument strength was assessed with the Sanderson–Windmeijer conditional F statistic, assuming no covariance between the mediator GWAS (Sanderson et al., 2021). As a sensitivity analysis, we also excluded variants within ±2 Mb of a lead and the extended MHC.
+## Partitioning direct and indirect effects with multivariable MR
 
-The effect through the set of mediators was Σ *a*ⱼ*b*ⱼ, where *b*ⱼ are the conditional MVMR estimates, so correlated mediators are not double-counted. The residual direct effect was *d* = *t* − Σ *a*ⱼ*b*ⱼ, and the mediated share was Σ *a*ⱼ*b*ⱼ / *t*. Standard errors used the delta method with the full MVMR covariance matrix of *b*, treating the *a*ⱼ as independent of each other and of *b*. Because mediators were selected on their association with GBC in the same data, these shares are exploratory. For display, each lead variant was oriented to its GBC risk-increasing allele, as in the PheWAS. Flipping the allele changes the sign of *t* and of every component, but not the mediated share.
+**Model.** Take a lead variant G with *K* selected mediators M₁, …, M_K. We modelled its total association with GBC as
+
+*t* = *d* + Σⱼ *a*ⱼ*b*ⱼ,
+
+where:
+
+- *a*ⱼ is G's association with Mⱼ, taken from the Mⱼ GWAS;
+- *b*ⱼ is the direct effect of Mⱼ on GBC, holding the other K − 1 mediators fixed;
+- *d* is the residual direct effect of G, which acts through none of the *K* mediators.
+
+With one mediator (*K* = 1) this is the decomposition in Figure 1, with *b* from univariable MR. With several mediators, univariable estimates cannot simply be summed. If the mediators are causally related, or share genetic determinants, each univariable *b*ⱼ partly carries the effects of the others, and the summed indirect effects would double-count the shared pathways. Conditional estimates from MVMR avoid this.
+
+**Instruments.** MVMR instruments were extracted from OpenGWAS with TwoSampleMR's `mv_extract_exposures()`. This took the union of each mediator's instruments (P < 5 × 10⁻⁸), clumped them jointly (r² < 0.001, 10 Mb, 1000 Genomes European reference) and looked up every instrument in every mediator GWAS, without proxies. We removed palindromic variants and all variants within ±1 Mb of any GBC lead variant. The remaining variants were harmonised to the GBC GWAS.
+
+**Estimation.** Let β̂_Y be the vector of instrument–GBC associations, with standard errors σ_Y, and let B̂ be the *n* × *K* matrix of instrument–mediator associations. We estimated *b* = (*b*₁, …, *b*_K) by inverse-variance weighted (IVW) MVMR. This is a weighted least-squares regression of β̂_Y on B̂ with no intercept and weights W = diag(σ_Y⁻²). Its covariance matrix used multiplicative random effects:
+
+V = (B̂ᵀWB̂)⁻¹ × max(1, φ), with φ = Q / (*n* − *K*),
+
+where Q is Cochran's heterogeneity statistic.
+
+**Diagnostics.**
+- *Instrument strength.* We assessed each mediator's conditional instrument strength with the Sanderson–Windmeijer conditional F statistic (Sanderson et al., 2021), treating F < 10 as weak. Overlap between the mediator GWAS samples is unknown, so the covariance between their instrument associations was set to zero.
+- *Conditioning versus instrument loss.* We also ran a univariable IVW for each mediator, restricted to its own genome-wide significant instruments within the MVMR instrument set. Comparing this with the MVMR estimate shows how much attenuation comes from conditioning and how much from the change in instruments.
+
+**Partitioning.** The indirect effect through Mⱼ was *i*ⱼ = *a*ⱼ*b*ⱼ, and the total indirect effect was *i* = Σⱼ *i*ⱼ. The residual direct effect was *d* = *t* − *i*, and the mediated share was *i* / *t*. Components can have opposite signs, so the share is not bounded by 0 and 1. A negative share means the indirect effect opposes the total, which we report as negative mediation.
+
+**Uncertainty.** Standard errors came from the first-order delta method. We assumed that the *a*ⱼ are independent of each other and of *b*, and that *t* is independent of both. We used the full MVMR covariance matrix V, so correlations between the conditional estimates carry through to the indirect effect:
+
+- Var(*i*ⱼ) = *b*ⱼ²Var(*a*ⱼ) + *a*ⱼ²V_jj
+- Var(*i*) = Σⱼ *b*ⱼ²Var(*a*ⱼ) + **a**ᵀV**a**
+- Var(*d*) = Var(*t*) + Var(*i*)
+
+95% confidence intervals were estimate ± 1.96 × SE.
+
+**Sensitivity analysis.** We repeated the MVMR, excluding variants within ±2 Mb of any lead variant and also the extended MHC (chr6:25–34 Mb).
+
+**Interpretation.**
+- The partition is linear on the log-odds scale. Odds ratios are non-collapsible, so *d* is a model-based residual rather than an identified natural direct effect. *d* also absorbs any effect through mediators outside the selected set.
+- MVMR assumes the instruments affect GBC only through the included mediators.
+- Mediators were selected on their association with GBC in the same GBC data, so the *b*ⱼ, and hence the shares, may be inflated by winner's curse and are exploratory.
+
+**Display.** For display, each lead variant was oriented to its GBC risk-increasing allele, as in the PheWAS. Flipping the allele changes the sign of *t* and of every component, but not the mediated share.
 
 ## Multiple testing
 
