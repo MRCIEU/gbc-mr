@@ -1,0 +1,7 @@
+"family","inventory","tested","unavailable","nominal_below_005","bh_below_005"
+"unique_pair_heterogeneity",33,33,0,33,33
+"pooled_mediator_mr",26,26,0,5,0
+"unique_pair_indirect_component",33,33,0,10,7
+"unique_pair_residual_component",33,33,0,33,33
+"sensitivity_pair_heterogeneity_2mb",33,33,0,33,33
+"sensitivity_pair_heterogeneity_2mb_mhc",33,33,0,33,33

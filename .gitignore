@@ -1,0 +1,10 @@
+.DS_Store
+/data/*.Rdata
+/data/*.7z
+/data/G2_*.csv
+/data/GBC-Phase-1-*.csv.gz
+/data/mr-phewas.csv
+/scripts/*_cache/
+/scripts/*_files/
+/scripts/.quarto/
+/scripts/from_meghna/*.pdf

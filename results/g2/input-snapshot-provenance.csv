@@ -1,0 +1,2 @@
+"source","source_md5","snapshot","snapshot_md5","selection","n_saved_pair_rows","n_saved_instrument_rows","n_full_outcome_rows","n_retained_outcome_rows","n_original_phewas_rows"
+"data/gbc_phewas_results-g2.Rdata","a6eda254487bef3fad3e6238c9776917","data/offline-g2-inputs.rds","3140a85d4192c4fdd13e14a153a1931f","Full saved instruments/int_chd/PheWAS; outcome rows matching their SNPs and all eight original leads",53,8549,9458118,7281,423
